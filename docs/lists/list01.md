@@ -98,3 +98,7 @@ abilities.
 - [darkest dungeon](https://store.steampowered.com/app/262060/darkest_dungeon/)
 
 ## Prototypes
+
+### early cat character design
+
+![cat-mockup](../images/cat-mockup.png)
