@@ -1,0 +1,12 @@
+[workspace]
+resolver = "3"
+members = ["game"]
+
+# from bevy getting started
+[profile.dev]
+opt-level = 1
+
+# from bevy getting started
+# large optimizations for dependency packages
+[profile.dev.package."*"]
+opt-level = 3
