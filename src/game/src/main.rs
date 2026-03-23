@@ -1,7 +1,6 @@
-mod menu;
 use bevy::prelude::*;
 use level::level_map::MapPlugin;
-use menu::MainMenuPlugin;
+use main_menu::MainMenuPlugin;
 use state::GameStatePlugin;
 use tracing::info;
 

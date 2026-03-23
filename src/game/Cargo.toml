@@ -10,4 +10,5 @@ linker = "clang"
 bevy = { version = "0.18", features = ["mouse"] }
 state = { path = "../state" }
 level = { path = "../level" }
+main_menu = { path = "../main_menu" }
 tracing = "0.1.44"

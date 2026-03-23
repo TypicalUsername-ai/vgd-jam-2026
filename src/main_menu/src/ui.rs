@@ -1,15 +1,8 @@
+use crate::MenuButtons;
 use bevy::{color::palettes::tailwind, prelude::*};
 use state::GlobalState;
 
-pub(crate) struct MainMenuPlugin {}
-
-impl Plugin for MainMenuPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GlobalState::StartMenu), draw_main_menu);
-    }
-}
-
-fn draw_main_menu(mut commands: Commands) {
+pub(crate) fn draw_main_menu(mut commands: Commands) {
     info!("spawning main menu text");
     commands.spawn((Camera2d, IsDefaultUiCamera));
     commands.spawn((
@@ -25,19 +18,6 @@ fn draw_main_menu(mut commands: Commands) {
         },
         children![menu_title("Game main menu"), menu_options_bundle()],
     ));
-    /*
-    commands.spawn((
-        Text::new("Main Menu"),
-        TextLayout::new_with_justify(Justify::Center),
-        TextFont {
-            font_size: 24.0,
-            font: default(),
-            ..default()
-        },
-        TextColor(Color::WHITE),
-        Transform::from_xyz(0.0, 0.0, 0.0),
-    ));
-    */
 }
 
 fn menu_options_bundle() -> impl Bundle {
@@ -53,9 +33,9 @@ fn menu_options_bundle() -> impl Bundle {
         },
         // BackgroundColor(tailwind::BLUE_300.into()),
         children![
-            make_button("Levels", Button),
-            make_button("Options", Button),
-            make_button("Quit", Button)
+            make_button("Levels", MenuButtons::Levels),
+            make_button("Options", MenuButtons::Options),
+            make_button("Quit", MenuButtons::Quit)
         ],
     )
 }
