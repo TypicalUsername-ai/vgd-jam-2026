@@ -2,9 +2,9 @@ use bevy::prelude::*;
 use state::GlobalState;
 mod ui;
 
-pub struct MainMenuPlugin {}
+pub struct LevelSelectPlugin {}
 
-impl Plugin for MainMenuPlugin {
+impl Plugin for LevelSelectPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GlobalState::LevelSelect), ui::draw_level_select);
     }
