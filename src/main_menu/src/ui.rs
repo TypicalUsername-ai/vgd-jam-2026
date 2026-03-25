@@ -1,4 +1,4 @@
-use crate::MenuButtons;
+use crate::{MainMenuComponent, MenuButtons};
 use bevy::{color::palettes::tailwind, prelude::*};
 use state::GlobalState;
 
@@ -17,6 +17,7 @@ pub(crate) fn draw_main_menu(mut commands: Commands) {
             ..default()
         },
         children![menu_title("Game main menu"), menu_options_bundle()],
+        MainMenuComponent {},
     ));
 }
 
@@ -62,6 +63,13 @@ fn menu_title(title: impl Into<String>) -> impl Bundle {
             TextColor(Color::WHITE),
         )],
     )
+}
+
+pub(crate) fn clear_main_menu(
+    mut commands: Commands,
+    query: Single<Entity, With<MainMenuComponent>>,
+) {
+    commands.entity(*query).despawn();
 }
 
 fn make_button(text: impl Into<String>, component: impl Component) -> impl Bundle {
