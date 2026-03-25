@@ -3032,6 +3032,10 @@ dependencies = [
 [[package]]
 name = "level_selector"
 version = "0.1.0"
+dependencies = [
+ "bevy",
+ "state",
+]
 
 [[package]]
 name = "lewton"
