@@ -1,7 +1,6 @@
 use crate::MenuButtons;
 use bevy::prelude::*;
 use state::GlobalState;
-use tracing::info;
 
 pub(crate) fn react_buttons(
     query: Query<(&MenuButtons, &Interaction), Changed<Interaction>>,

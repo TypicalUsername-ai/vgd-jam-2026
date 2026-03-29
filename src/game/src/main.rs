@@ -3,7 +3,6 @@ use level::CharacterSelectPlugin;
 use level_selector::LevelSelectPlugin;
 use main_menu::MainMenuPlugin;
 use state::GameStatePlugin;
-use tracing::info;
 
 mod window;
 

@@ -1,8 +1,6 @@
-use bevy::{color::palettes::tailwind, prelude::*};
+use bevy::prelude::*;
 use state::GlobalState;
 use tracing::warn;
-
-use crate::LevelSelectPlugin;
 
 #[derive(Debug, Component)]
 pub(crate) struct LevelSelectMenu {}
@@ -18,7 +16,7 @@ pub(crate) fn react_buttons(
     for (button, interaction) in query {
         match *interaction {
             Interaction::Pressed => {
-                warn!("Pressed a button !!!");
+                warn!("Pressed a button {:?}", button);
                 next_global.set(GlobalState::CharacterSelect);
             }
             Interaction::Hovered => (),

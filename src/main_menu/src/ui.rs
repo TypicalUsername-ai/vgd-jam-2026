@@ -1,6 +1,5 @@
 use crate::{MainMenuComponent, MenuButtons};
-use bevy::{color::palettes::tailwind, prelude::*};
-use state::GlobalState;
+use bevy::prelude::*;
 
 pub(crate) fn draw_main_menu(mut commands: Commands) {
     info!("spawning main menu text");
