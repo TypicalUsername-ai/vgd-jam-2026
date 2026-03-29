@@ -1,3 +1,4 @@
+use super::{available_characters, game_objectives, roster_slots};
 use bevy::prelude::*;
 
 pub(crate) fn draw_character_select(mut commands: Commands) {
@@ -18,45 +19,9 @@ fn make_select_menu() -> impl Bundle {
             ..default()
         },
         children![
-            make_roster_slots(),
-            make_game_objectives(),
-            make_available_characters(),
+            roster_slots::make_bundle(),
+            game_objectives::make_bundle(),
+            available_characters::make_bundle(),
         ],
-    )
-}
-
-fn make_roster_slots() -> impl Bundle {
-    (
-        Node {
-            grid_column: GridPlacement::span(4),
-            grid_row: GridPlacement::span(1),
-            ..default()
-        },
-        children![Text::new("roster"),],
-        BackgroundColor(Color::WHITE),
-    )
-}
-
-fn make_game_objectives() -> impl Bundle {
-    (
-        Node {
-            grid_column: GridPlacement::span(2),
-            grid_row: GridPlacement::span(1),
-            ..default()
-        },
-        children![Text::new("roster"),],
-        BackgroundColor(Color::BLACK),
-    )
-}
-
-fn make_available_characters() -> impl Bundle {
-    (
-        Node {
-            grid_column: GridPlacement::span(6),
-            grid_row: GridPlacement::span(1),
-            ..default()
-        },
-        children![Text::new("roster"),],
-        BackgroundColor(Color::srgb_u8(200, 0, 0)),
     )
 }
