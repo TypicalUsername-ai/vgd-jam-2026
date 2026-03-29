@@ -15,6 +15,7 @@ pub struct LevelSelectPlugin {
 impl Plugin for LevelSelectPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GlobalState::LevelSelect), ui::draw_level_select);
+        app.add_systems(OnExit(GlobalState::LevelSelect), ui::clear_level_select);
     }
 }
 

@@ -1,6 +1,15 @@
 use bevy::{color::palettes::tailwind, prelude::*};
 use state::GlobalState;
 
+use crate::LevelSelectPlugin;
+
+#[derive(Debug, Component)]
+pub(crate) struct LevelSelectMenu {}
+
+#[derive(Debug, Component)]
+#[require(Button)]
+pub(crate) struct LevelSelectButton {}
+
 pub(crate) fn draw_level_select(mut commands: Commands) {
     info!("spawning main menu text");
     commands.spawn((
@@ -21,6 +30,13 @@ pub(crate) fn draw_level_select(mut commands: Commands) {
     ));
 }
 
+pub(crate) fn clear_level_select(
+    mut commands: Commands,
+    query: Single<Entity, With<LevelSelectMenu>>,
+) {
+    commands.entity(*query).despawn();
+}
+
 fn available_levels_bundle() -> impl Bundle {
     (
         Node {
@@ -32,7 +48,7 @@ fn available_levels_bundle() -> impl Bundle {
             ..default()
         },
         // BackgroundColor(tailwind::BLUE_300.into()),
-        children![make_button("Demo level", Button)],
+        children![make_button("Demo level", LevelSelectButton {})],
     )
 }
 
