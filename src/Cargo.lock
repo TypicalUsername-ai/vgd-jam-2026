@@ -3038,6 +3038,7 @@ dependencies = [
  "ron",
  "serde",
  "state",
+ "tracing",
 ]
 
 [[package]]

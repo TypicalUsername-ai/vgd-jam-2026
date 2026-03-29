@@ -8,6 +8,8 @@ mod ui;
 pub use level_config::LevelConfiguration;
 pub use level_select_config::LevelSelectConfig;
 
+use crate::ui::react_buttons;
+
 pub struct LevelSelectPlugin {
     config: LevelSelectConfig,
 }
@@ -16,6 +18,10 @@ impl Plugin for LevelSelectPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GlobalState::LevelSelect), ui::draw_level_select);
         app.add_systems(OnExit(GlobalState::LevelSelect), ui::clear_level_select);
+        app.add_systems(
+            Update,
+            react_buttons.run_if(in_state(GlobalState::LevelSelect)),
+        );
     }
 }
 

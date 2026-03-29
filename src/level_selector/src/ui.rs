@@ -1,5 +1,6 @@
 use bevy::{color::palettes::tailwind, prelude::*};
 use state::GlobalState;
+use tracing::warn;
 
 use crate::LevelSelectPlugin;
 
@@ -9,6 +10,22 @@ pub(crate) struct LevelSelectMenu {}
 #[derive(Debug, Component)]
 #[require(Button)]
 pub(crate) struct LevelSelectButton {}
+
+pub(crate) fn react_buttons(
+    query: Query<(&LevelSelectButton, &Interaction), Changed<Interaction>>,
+    mut next_global: ResMut<NextState<GlobalState>>,
+) {
+    for (button, interaction) in query {
+        match *interaction {
+            Interaction::Pressed => {
+                warn!("Pressed a button !!!");
+                next_global.set(GlobalState::CharacterSelect);
+            }
+            Interaction::Hovered => (),
+            Interaction::None => (),
+        }
+    }
+}
 
 pub(crate) fn draw_level_select(mut commands: Commands) {
     info!("spawning main menu text");
@@ -27,6 +44,7 @@ pub(crate) fn draw_level_select(mut commands: Commands) {
             level_select_title("Game main menu"),
             available_levels_bundle()
         ],
+        LevelSelectMenu {},
     ));
 }
 
