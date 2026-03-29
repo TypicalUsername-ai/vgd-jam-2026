@@ -1,0 +1,7 @@
+LevelSelectConfig (
+    levels : [
+        LevelConfiguration(
+            name : "Demo Level"
+        )
+    ]
+)
