@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use level::level_map::MapPlugin;
+use level::CharacterSelectPlugin;
 use level_selector::LevelSelectPlugin;
 use main_menu::MainMenuPlugin;
 use state::GameStatePlugin;
@@ -12,9 +12,9 @@ fn main() {
 
     App::new()
         .add_plugins(DefaultPlugins.set(window::default_fulscreen_plugin()))
-        .add_plugins(MapPlugin {})
         .add_plugins(GameStatePlugin {})
         .add_plugins(MainMenuPlugin {})
         .add_plugins(LevelSelectPlugin::from(config))
+        .add_plugins(CharacterSelectPlugin {})
         .run();
 }
