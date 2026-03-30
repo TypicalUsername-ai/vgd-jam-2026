@@ -14,7 +14,7 @@ fn main() {
             DefaultPlugins
                 .set(window::default_fulscreen_plugin())
                 .set(AssetPlugin {
-                    file_path: "../assets".into(),
+                    file_path: "../../assets".into(),
                     ..default()
                 }),
         )
