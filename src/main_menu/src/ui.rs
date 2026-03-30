@@ -3,7 +3,15 @@ use bevy::prelude::*;
 
 pub(crate) fn draw_main_menu(mut commands: Commands) {
     info!("spawning main menu text");
-    commands.spawn((Camera2d, IsDefaultUiCamera));
+    commands.spawn((
+        Camera {
+            order: 1,
+            clear_color: ClearColorConfig::None,
+            ..default()
+        },
+        Camera2d,
+        IsDefaultUiCamera,
+    ));
     commands.spawn((
         Node {
             width: percent(100),
