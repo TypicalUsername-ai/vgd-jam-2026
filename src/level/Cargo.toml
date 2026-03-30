@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 bevy = "0.18.1"
 state = { path = "../state" }
+tracing = "0.1.44"
