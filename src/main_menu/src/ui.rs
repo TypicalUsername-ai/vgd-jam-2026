@@ -15,12 +15,12 @@ pub(crate) fn draw_main_menu(mut commands: Commands) {
             justify_items: JustifyItems::Center,
             ..default()
         },
-        children![menu_title("Game main menu"), menu_options_bundle()],
+        children![menu_title("Game main menu"), menu_options()],
         MainMenuComponent {},
     ));
 }
 
-fn menu_options_bundle() -> impl Bundle {
+fn menu_options() -> impl Bundle {
     (
         Node {
             width: percent(100),
@@ -33,9 +33,9 @@ fn menu_options_bundle() -> impl Bundle {
         },
         // BackgroundColor(tailwind::BLUE_300.into()),
         children![
-            make_button("Levels", MenuButtons::Levels),
-            make_button("Options", MenuButtons::Options),
-            make_button("Quit", MenuButtons::Quit)
+            menu_button("Levels", MenuButtons::Levels),
+            menu_button("Options", MenuButtons::Options),
+            menu_button("Quit", MenuButtons::Quit)
         ],
     )
 }
@@ -71,7 +71,7 @@ pub(crate) fn clear_main_menu(
     commands.entity(*query).despawn();
 }
 
-fn make_button(text: impl Into<String>, component: impl Component) -> impl Bundle {
+fn menu_button(text: impl Into<String>, component: impl Component) -> impl Bundle {
     (
         Node {
             border: UiRect::all(px(5.0)),
