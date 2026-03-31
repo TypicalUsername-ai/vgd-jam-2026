@@ -17,7 +17,7 @@ pub(crate) fn react_buttons(
         match *interaction {
             Interaction::Pressed => {
                 warn!("Pressed a button {:?}", button);
-                next_global.set(GlobalState::CharacterSelect);
+                next_global.set(GlobalState::ActiveLevel);
             }
             Interaction::Hovered => (),
             Interaction::None => (),

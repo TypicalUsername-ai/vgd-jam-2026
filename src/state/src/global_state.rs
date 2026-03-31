@@ -5,6 +5,5 @@ pub enum GlobalState {
     #[default]
     StartMenu,
     LevelSelect,
-    CharacterSelect,
     ActiveLevel,
 }

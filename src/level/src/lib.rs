@@ -17,14 +17,14 @@ pub(crate) fn setup_camera(mut commands: Commands) {
 impl Plugin for CharacterSelectPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            OnEnter(GlobalState::CharacterSelect),
+            OnEnter(GlobalState::ActiveLevel),
             (
                 setup_camera.before(characters::chicken::spawn_chicken), //character_select::ui::draw_character_select.before(characters::chicken::spawn_chicken),
                 characters::chicken::spawn_chicken,
             ),
         );
         app.add_systems(
-            OnExit(GlobalState::CharacterSelect),
+            OnExit(GlobalState::ActiveLevel),
             character_select::ui::clear_character_select,
         );
     }
