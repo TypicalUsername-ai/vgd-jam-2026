@@ -1,6 +1,7 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct LevelConfiguration {
-    name: String,
+    pub(crate) name: String,
+    pub(crate) id: String,
 }

@@ -1,7 +1,8 @@
 LevelSelectConfig (
     levels : [
         LevelConfiguration(
-            name : "Demo Level"
+            name : "Demo Level",
+            id: "demo_1"
         )
     ]
 )

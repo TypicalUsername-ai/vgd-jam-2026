@@ -2,12 +2,16 @@ use bevy::prelude::*;
 use state::GlobalState;
 use tracing::warn;
 
+use crate::LevelSelectConfig;
+
 #[derive(Debug, Component)]
 pub(crate) struct LevelSelectMenu {}
 
 #[derive(Debug, Component)]
 #[require(Button)]
-pub(crate) struct LevelSelectButton {}
+pub(crate) struct LevelSelectButton {
+    pub(crate) level_id: String,
+}
 
 pub(crate) fn react_buttons(
     query: Query<(&LevelSelectButton, &Interaction), Changed<Interaction>>,
@@ -25,25 +29,47 @@ pub(crate) fn react_buttons(
     }
 }
 
-pub(crate) fn draw_level_select(mut commands: Commands) {
+pub(crate) fn draw_level_select(mut commands: Commands, levels_config: Res<LevelSelectConfig>) {
     info!("spawning main menu text");
-    commands.spawn((
-        Node {
-            width: percent(100),
-            height: percent(100),
-            display: Display::Flex,
-            justify_content: JustifyContent::SpaceAround,
-            align_items: AlignItems::Center,
-            flex_direction: FlexDirection::Column,
-            justify_items: JustifyItems::Center,
-            ..default()
-        },
-        children![
-            level_select_title("Game main menu"),
-            available_levels_bundle()
-        ],
-        LevelSelectMenu {},
-    ));
+    commands
+        .spawn((
+            Node {
+                width: percent(100),
+                height: percent(100),
+                display: Display::Flex,
+                justify_content: JustifyContent::SpaceAround,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Column,
+                justify_items: JustifyItems::Center,
+                ..default()
+            },
+            LevelSelectMenu {},
+        ))
+        .with_children(|parent| {
+            parent.spawn(level_select_title("Select level"));
+            parent
+                .spawn(
+                    Node {
+                        width: percent(100),
+                        height: percent(80),
+                        display: Display::Grid,
+                        align_items: AlignItems::Center,
+                        justify_content: JustifyContent::SpaceEvenly,
+                        ..default()
+                    },
+                    // BackgroundColor(tailwind::BLUE_300.into()),
+                )
+                .with_children(|level_pane| {
+                    for configuration in levels_config.levels.iter() {
+                        level_pane.spawn(make_button(
+                            configuration.name.clone(),
+                            LevelSelectButton {
+                                level_id: configuration.id.clone(),
+                            },
+                        ));
+                    }
+                });
+        });
 }
 
 pub(crate) fn clear_level_select(
@@ -51,21 +77,6 @@ pub(crate) fn clear_level_select(
     query: Single<Entity, With<LevelSelectMenu>>,
 ) {
     commands.entity(*query).despawn();
-}
-
-fn available_levels_bundle() -> impl Bundle {
-    (
-        Node {
-            width: percent(100),
-            height: percent(80),
-            display: Display::Grid,
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::SpaceEvenly,
-            ..default()
-        },
-        // BackgroundColor(tailwind::BLUE_300.into()),
-        children![make_button("Demo level", LevelSelectButton {})],
-    )
 }
 
 fn level_select_title(title: impl Into<String>) -> impl Bundle {
