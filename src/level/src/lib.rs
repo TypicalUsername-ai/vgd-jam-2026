@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 use state::GlobalState;
 
-// pub mod level_map;
 mod character_select;
 mod characters;
+mod level_map;
 
 pub struct CharacterSelectPlugin {}
 
@@ -16,6 +16,9 @@ pub(crate) fn setup_camera(mut commands: Commands) {
 
 impl Plugin for CharacterSelectPlugin {
     fn build(&self, app: &mut App) {
+        app.add_plugins(level_map::MapPlugin {
+            maps_directory: "../assets".into(),
+        });
         app.add_systems(
             OnEnter(GlobalState::ActiveLevel),
             (
@@ -23,6 +26,7 @@ impl Plugin for CharacterSelectPlugin {
                 characters::chicken::spawn_chicken,
             ),
         );
+        app.add_systems(Update, characters::chicken::animate_chicken);
         app.add_systems(
             OnExit(GlobalState::ActiveLevel),
             character_select::ui::clear_character_select,
