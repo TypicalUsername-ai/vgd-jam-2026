@@ -7,3 +7,6 @@ pub enum GlobalState {
     LevelSelect,
     ActiveLevel,
 }
+
+#[derive(States, Debug, Default, Clone, PartialEq, Eq, Hash)]
+pub struct CurrentLevelState(Option<String>);
