@@ -1,6 +1,8 @@
 mod global_state;
+mod level_state;
 use bevy::prelude::*;
-pub use global_state::{GlobalState, LevelState};
+pub use global_state::GlobalState;
+pub use level_state::LevelState;
 
 pub struct GameStatePlugin {}
 
