@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use state::GlobalState;
 
-mod character_select;
 mod characters;
 mod level_map;
 
@@ -27,10 +26,7 @@ impl Plugin for CharacterSelectPlugin {
             ),
         );
         app.add_systems(Update, characters::chicken::animate_chicken);
-        app.add_systems(
-            OnExit(GlobalState::ActiveLevel),
-            character_select::ui::clear_character_select,
-        );
+        //app.add_systems(OnExit(GlobalState::ActiveLevel), ());
     }
 }
 
