@@ -7,3 +7,5 @@ edition = "2024"
 bevy = "0.18.1"
 state = { path = "../state" }
 tracing = "0.1.44"
+ron = "0.12"
+serde = { version = "1", features = ["derive"] }
