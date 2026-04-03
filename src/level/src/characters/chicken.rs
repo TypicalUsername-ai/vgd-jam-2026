@@ -1,4 +1,3 @@
-use crate::LevelCamera;
 use crate::characters::utils::{AnimationState, AnimationTime};
 use crate::level_map::PathWalker;
 use tracing::warn;
@@ -30,7 +29,7 @@ pub fn spawn_chicken(
     ));
 
     let facing_init = Facing::Left;
-    let start_idx = facing_init.clone().into();
+    let start_idx = facing_init.into();
 
     commands.spawn((
         RenderLayers::layer(0),
@@ -56,7 +55,7 @@ pub fn spawn_chicken(
 
 pub fn animate_chicken(
     time: Res<Time>,
-    mut query: Query<(&mut AnimationState, &mut AnimationTime, &mut Sprite), With<Chicken>>,
+    query: Query<(&mut AnimationState, &mut AnimationTime, &mut Sprite), With<Chicken>>,
 ) {
     for (mut anim, mut timer, mut sprite) in query {
         let atlas = match sprite.texture_atlas.as_mut() {

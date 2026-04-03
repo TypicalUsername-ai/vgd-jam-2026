@@ -3,12 +3,10 @@ use std::path::PathBuf;
 mod map_config;
 mod path;
 use crate::{
-    characters::utils::{AnimationState, AnimationTime, Facing},
     level_map::map_config::LevelMapConfig,
     level_map::path::walk_mobs,
 };
 use state::{GlobalState, LevelState};
-use tracing::info;
 
 pub(crate) use path::PathWalker;
 
@@ -26,7 +24,7 @@ impl Plugin for MapPlugin {
 fn load_level(mut commands: Commands, current_level: Res<State<LevelState>>) {
     match &**current_level {
         LevelState::Active {
-            id,
+            id: _,
             map_config_path,
         } => {
             let map_conf = map_config::LevelMapConfig::from(map_config_path.as_path());

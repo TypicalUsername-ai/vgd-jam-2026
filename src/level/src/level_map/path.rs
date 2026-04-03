@@ -20,7 +20,7 @@ impl std::default::Default for PathWalker {
 }
 
 pub(crate) fn walk_mobs(
-    mut commands: Commands,
+    _commands: Commands,
     time: Res<Time>,
     mobs_query: Query<(&mut PathWalker, &mut Transform, &mut AnimationState), With<PathWalker>>,
     map_config: Res<LevelMapConfig>,
@@ -44,7 +44,7 @@ pub(crate) fn walk_mobs(
                 if overshoot >= 0.0 {
                     transform.translation = transform
                         .translation
-                        .move_towards(tgt.clone(), walker.speed);
+                        .move_towards(*tgt, walker.speed);
                 } else {
                     walker.segment += 1;
                     if walker.segment < map_config.path_points.len() {
@@ -52,7 +52,7 @@ pub(crate) fn walk_mobs(
                             .path_points
                             .get(walker.segment)
                             .expect("Length bounds were just checked");
-                        transform.translation = tgt.move_towards(new_tgt.clone(), -overshoot);
+                        transform.translation = tgt.move_towards(*new_tgt, -overshoot);
                     } else {
                         state.moving = false;
                     }
