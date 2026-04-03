@@ -8,10 +8,11 @@ pub enum GlobalState {
     ActiveLevel,
 }
 
-#[derive(States, Debug, Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut)]
-pub struct CurrentLevelState(Option<String>);
+#[derive(SubStates, Debug, Default, Clone, PartialEq, Eq, Hash)]
+#[source(GlobalState = GlobalState::ActiveLevel)]
+pub struct LevelState(Option<String>);
 
-impl From<Option<String>> for CurrentLevelState {
+impl From<Option<String>> for LevelState {
     fn from(value: Option<String>) -> Self {
         Self(value)
     }
