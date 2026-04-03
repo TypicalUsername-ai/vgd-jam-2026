@@ -8,9 +8,9 @@ pub(crate) enum Facing {
     Right,
 }
 
-impl Into<usize> for Facing {
-    fn into(self) -> usize {
-        match self {
+impl From<Facing> for usize {
+    fn from(value: Facing) -> Self {
+        match value {
             Facing::Up => 0,
             Facing::Left => 1,
             Facing::Down => 2,
