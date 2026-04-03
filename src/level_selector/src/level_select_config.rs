@@ -18,7 +18,7 @@ impl From<&Path> for LevelSelectConfig {
                 let _ = config_file.read_to_string(&mut buf);
                 let levels_config =
                     ron::from_str(&buf).expect("error parsing options file!! {value}");
-                return levels_config;
+                levels_config
             }
             Err(_err) => {
                 panic!("error reading file!! {}", value.display())

@@ -3,7 +3,7 @@ use bevy::{
     window::{ExitCondition::OnPrimaryClosed, WindowResolution},
 };
 
-pub(crate) fn default_fulscreen_plugin() -> WindowPlugin {
+pub fn default_fulscreen_plugin() -> WindowPlugin {
     WindowPlugin {
         primary_window: Some(Window {
             // present_mode: (),
