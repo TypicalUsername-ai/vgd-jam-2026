@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use state::GlobalState;
+use state::{GlobalState, LevelState};
 use tracing::warn;
 
 use crate::LevelSelectConfig;
@@ -16,11 +16,13 @@ pub(crate) struct LevelSelectButton {
 pub(crate) fn react_buttons(
     query: Query<(&LevelSelectButton, &Interaction), Changed<Interaction>>,
     mut next_global: ResMut<NextState<GlobalState>>,
+    mut next_level: ResMut<NextState<LevelState>>,
 ) {
     for (button, interaction) in query {
         match *interaction {
             Interaction::Pressed => {
                 warn!("Pressed a button {:?}", button);
+                next_level.set(Some(button.level_id.clone()).into());
                 next_global.set(GlobalState::ActiveLevel);
             }
             Interaction::Hovered => (),
