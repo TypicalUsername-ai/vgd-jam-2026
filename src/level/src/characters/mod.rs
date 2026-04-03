@@ -1,2 +1,2 @@
 pub mod chicken;
-mod utils;
+pub mod utils;

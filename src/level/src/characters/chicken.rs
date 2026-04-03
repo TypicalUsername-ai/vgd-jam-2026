@@ -1,11 +1,11 @@
 use crate::LevelCamera;
 use crate::characters::utils::{AnimationState, AnimationTime};
+use crate::level_map::PathWalker;
 use tracing::warn;
 
 use super::utils::Facing;
 use bevy::camera::visibility::RenderLayers;
-use bevy::render::render_graph::RenderLabel;
-use bevy::{math::VectorSpace, prelude::*};
+use bevy::prelude::*;
 
 // width of walking is 128 x 128 px
 // 4 x 4 tiles so tile size is : 32 x 32 px
@@ -43,6 +43,7 @@ pub fn spawn_chicken(
         ),
         Transform::from_translation(Vec3::ZERO),
         Chicken {},
+        PathWalker::default(),
         AnimationState {
             facing: facing_init,
             moving: true,
