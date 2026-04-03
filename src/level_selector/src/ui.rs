@@ -15,6 +15,7 @@ pub(crate) struct LevelSelectButton {
 
 pub(crate) fn react_buttons(
     query: Query<(&LevelSelectButton, &Interaction), Changed<Interaction>>,
+    lvl_config: Res<LevelSelectConfig>,
     mut next_global: ResMut<NextState<GlobalState>>,
     mut next_level: ResMut<NextState<LevelState>>,
 ) {
@@ -22,7 +23,10 @@ pub(crate) fn react_buttons(
         match *interaction {
             Interaction::Pressed => {
                 warn!("Pressed a button {:?}", button);
-                next_level.set(Some(button.level_id.clone()).into());
+                next_level.set(LevelState::load(
+                    button.level_id.clone(),
+                    lvl_config.map_config_folder.clone(),
+                ));
                 next_global.set(GlobalState::ActiveLevel);
             }
             Interaction::Hovered => (),

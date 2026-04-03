@@ -2,10 +2,15 @@ use crate::LevelConfiguration;
 use bevy::prelude::*;
 use ron;
 use serde::Deserialize;
-use std::{fs::File, io::Read, path::Path};
+use std::{
+    fs::File,
+    io::Read,
+    path::{Path, PathBuf},
+};
 
-#[derive(Deserialize, Resource, Clone, Deref)]
+#[derive(Deserialize, Resource, Clone)]
 pub struct LevelSelectConfig {
+    pub(crate) map_config_folder: PathBuf,
     pub(crate) levels: Vec<LevelConfiguration>,
 }
 
