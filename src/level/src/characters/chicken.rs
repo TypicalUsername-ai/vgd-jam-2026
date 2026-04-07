@@ -40,7 +40,7 @@ pub fn spawn_chicken(
                 index: start_idx,
             },
         ),
-        Transform::from_translation(Vec3::ZERO),
+        Transform::from_translation(Vec3::ZERO.with_z(5.0)),
         Chicken {},
         PathWalker::default(),
         AnimationState {

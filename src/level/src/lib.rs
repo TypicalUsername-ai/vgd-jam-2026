@@ -1,16 +1,25 @@
-use bevy::prelude::*;
+use bevy::{camera::visibility::RenderLayers, prelude::*};
 use state::GlobalState;
+
+use crate::level_map::LevelMapConfig;
 
 mod characters;
 mod level_map;
+mod tiles;
 
 pub struct CharacterSelectPlugin {}
 
 #[derive(Debug, Component)]
 pub struct LevelCamera {}
 
+const DEFAULT_LAYERS: [usize; 6] = [0, 1, 2, 3, 4, 5];
+
 pub(crate) fn setup_camera(mut commands: Commands) {
-    commands.spawn((Camera2d, LevelCamera {}));
+    commands.spawn((
+        Camera2d,
+        RenderLayers::from_layers(&DEFAULT_LAYERS),
+        LevelCamera {},
+    ));
 }
 
 impl Plugin for CharacterSelectPlugin {

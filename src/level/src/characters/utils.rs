@@ -24,7 +24,7 @@ const FACE_XY_VALUES: [[Facing; 2]; 2] =
 
 impl From<Vec3> for Facing {
     fn from(value: Vec3) -> Self {
-        let mpos = value.abs().max_position();
+        let mpos = value.abs().xy().max_position();
         // 0 for false, 1 for true
         let ineg = value.to_array()[mpos].is_sign_positive() as usize;
         // info!("{} | mpos {}, ineg {}", value.normalize(), mpos, ineg);

@@ -13,7 +13,7 @@ impl std::default::Default for PathWalker {
     fn default() -> Self {
         Self {
             timer: Timer::from_seconds(0.25, TimerMode::Repeating),
-            speed: 3.0,
+            speed: 5.0,
             segment: 0,
         }
     }
@@ -32,27 +32,27 @@ pub(crate) fn walk_mobs(
         if walker.timer.just_finished() {
             //info!("Walk timer firing!");
             // segment nr means to which point youre going
-            if let Some(tgt) = map_config.path_points.get(walker.segment)
+            if let Some(segment_end) = map_config.path_points.get(walker.segment)
                 && state.moving
             {
+                let tgt = segment_end.with_z(transform.translation.z);
                 let face = Facing::from(tgt - transform.translation);
                 if face != state.facing {
                     state.facing = face;
                 }
-                // info!("Current position: {}", transform.translation);
+                //info!("Current position: {}", transform.translation);
                 let overshoot = tgt.distance(transform.translation) - walker.speed;
                 if overshoot >= 0.0 {
-                    transform.translation = transform
-                        .translation
-                        .move_towards(*tgt, walker.speed);
+                    transform.translation = transform.translation.move_towards(tgt, walker.speed);
                 } else {
                     walker.segment += 1;
                     if walker.segment < map_config.path_points.len() {
                         let new_tgt = map_config
                             .path_points
                             .get(walker.segment)
-                            .expect("Length bounds were just checked");
-                        transform.translation = tgt.move_towards(*new_tgt, -overshoot);
+                            .expect("Length bounds were just checked")
+                            .with_z(transform.translation.z);
+                        transform.translation = tgt.move_towards(new_tgt, -overshoot)
                     } else {
                         state.moving = false;
                     }
