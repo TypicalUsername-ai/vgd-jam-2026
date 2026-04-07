@@ -2,13 +2,15 @@ use bevy::prelude::*;
 use std::path::PathBuf;
 mod map_config;
 mod path;
-use crate::{
-    level_map::map_config::LevelMapConfig,
-    level_map::path::walk_mobs,
-};
+mod spawner_point;
+mod tower_point;
+use crate::{level_map::path::walk_mobs, tiles};
 use state::{GlobalState, LevelState};
 
+pub(crate) use map_config::LevelMapConfig;
 pub(crate) use path::PathWalker;
+pub(crate) use spawner_point::SpawnerPoint;
+pub(crate) use tower_point::TowerPoint;
 
 pub(crate) struct MapPlugin {
     pub(crate) maps_directory: PathBuf,
@@ -16,7 +18,15 @@ pub(crate) struct MapPlugin {
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GlobalState::ActiveLevel), load_level);
+        app.add_systems(
+            OnEnter(GlobalState::ActiveLevel),
+            (
+                load_level,
+                tiles::spawn_soil_path,
+                tiles::spawn_build_locations,
+            )
+                .chain(),
+        );
         app.add_systems(Update, walk_mobs.run_if(in_state(GlobalState::ActiveLevel)));
     }
 }
