@@ -31,7 +31,8 @@ pub(crate) fn spawn_build_locations(
                     index: 17,
                 },
             ),
-            Transform::from_translation(point.position.with_z(1.0)),
+            Transform::from_translation(point.position.with_z(1.0))
+                .with_scale(Vec3::splat(3.0).with_z(0.0)),
         ));
     }
 }
