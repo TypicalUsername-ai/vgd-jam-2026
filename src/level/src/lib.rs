@@ -30,11 +30,11 @@ impl Plugin for CharacterSelectPlugin {
         app.add_systems(
             OnEnter(GlobalState::ActiveLevel),
             (
-                setup_camera.before(characters::chicken::spawn_chicken), //character_select::ui::draw_character_select.before(characters::chicken::spawn_chicken),
+                //setup_camera.before(characters::chicken::spawn_chicken), //character_select::ui::draw_character_select.before(characters::chicken::spawn_chicken),
                 characters::chicken::spawn_chicken,
             ),
         );
-        app.add_systems(Update, characters::chicken::animate_chicken);
+        app.add_systems(Update, (characters::chicken::animate_chicken).chain());
         //app.add_systems(OnExit(GlobalState::ActiveLevel), ());
     }
 }
