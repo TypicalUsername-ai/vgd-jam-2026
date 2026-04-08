@@ -1,8 +1,13 @@
 LevelSelectConfig (
+    map_config_folder : "../assets/maps",
     levels : [
         LevelConfiguration(
             name : "Demo Level",
             id: "demo_1"
+        ),
+        LevelConfiguration(
+            name : "Trial 1",
+            id: "trial_1"
         )
     ]
 )
