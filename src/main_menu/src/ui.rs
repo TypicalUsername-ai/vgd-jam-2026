@@ -10,6 +10,7 @@ pub(crate) fn draw_main_menu(mut commands: Commands) {
             ..default()
         },
         Camera2d,
+        Pickable::IGNORE,
         IsDefaultUiCamera,
     ));
     commands.spawn((
