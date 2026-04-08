@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["game"]
+members = ["game", "level", "level_selector", "main_menu", "state"]
 
 # from bevy getting started
 [profile.dev]
