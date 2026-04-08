@@ -13,6 +13,7 @@ level = { path = "../level" }
 main_menu = { path = "../main_menu" }
 level_selector = { path = "../level_selector" }
 tracing = "0.1.44"
+bevy-inspector-egui = "0.36.0"
 
 [lints.clippy]
 pedantic = { level = "deny", priority = -1 }

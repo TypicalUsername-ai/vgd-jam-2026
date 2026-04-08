@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 use level::CharacterSelectPlugin;
 use level_selector::LevelSelectPlugin;
 use main_menu::MainMenuPlugin;
@@ -18,6 +19,8 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_plugins(EguiPlugin::default())
+        .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(GameStatePlugin {})
         .add_plugins(MainMenuPlugin {})
         .add_plugins(LevelSelectPlugin::from(config))
