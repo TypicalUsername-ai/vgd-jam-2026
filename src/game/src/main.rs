@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+#[cfg(feature = "inspector")]
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 use level::CharacterSelectPlugin;
 use level_selector::LevelSelectPlugin;
@@ -10,20 +11,24 @@ mod window;
 fn main() {
     let config = std::path::Path::new("../assets/level-config.ron");
 
-    App::new()
-        .add_plugins(
-            DefaultPlugins
-                .set(window::default_fulscreen_plugin())
-                .set(AssetPlugin {
-                    file_path: "../../assets".into(),
-                    ..default()
-                }),
-        )
-        .add_plugins(EguiPlugin::default())
-        .add_plugins(WorldInspectorPlugin::new())
-        .add_plugins(GameStatePlugin {})
-        .add_plugins(MainMenuPlugin {})
-        .add_plugins(LevelSelectPlugin::from(config))
-        .add_plugins(CharacterSelectPlugin {})
-        .run();
+    let mut app = App::new();
+
+    app.add_plugins(
+        DefaultPlugins
+            .set(window::default_fulscreen_plugin())
+            .set(AssetPlugin {
+                file_path: "../../assets".into(),
+                ..default()
+            }),
+    )
+    .add_plugins(GameStatePlugin {})
+    .add_plugins(MainMenuPlugin {})
+    .add_plugins(LevelSelectPlugin::from(config))
+    .add_plugins(CharacterSelectPlugin {});
+
+    #[cfg(feature = "inspector")]
+    app.add_plugins(EguiPlugin::default())
+        .add_plugins(WorldInspectorPlugin::new());
+
+    app.run();
 }
