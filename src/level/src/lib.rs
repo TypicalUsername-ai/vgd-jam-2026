@@ -1,7 +1,7 @@
+use crate::level_map::LevelMapConfig;
+use bevy::color::palettes::basic;
 use bevy::{camera::visibility::RenderLayers, prelude::*};
 use state::GlobalState;
-
-use crate::level_map::LevelMapConfig;
 
 mod characters;
 mod level_map;
