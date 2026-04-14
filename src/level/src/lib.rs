@@ -1,11 +1,10 @@
-use crate::level_map::LevelMapConfig;
 use bevy::color::palettes::basic;
 use bevy::{camera::visibility::RenderLayers, prelude::*};
 use state::GlobalState;
 
-mod characters;
+mod buildings;
 mod level_map;
-mod tiles;
+mod minions;
 
 pub struct CharacterSelectPlugin {}
 
@@ -24,18 +23,32 @@ pub(crate) fn setup_camera(mut commands: Commands) {
 
 impl Plugin for CharacterSelectPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(level_map::MapPlugin {
-            maps_directory: "../assets".into(),
-        });
+        //app.init_resource::<MinionHandles>();
         app.add_systems(
             OnEnter(GlobalState::ActiveLevel),
             (
-                //setup_camera.before(characters::chicken::spawn_chicken), //character_select::ui::draw_character_select.before(characters::chicken::spawn_chicken),
-                characters::chicken::spawn_chicken,
-            ),
+                buildings::register_turrets,
+                buildings::register_spawners,
+                level_map::load_level,
+                level_map::setup_background,
+                level_map::setup_turrets,
+                level_map::setup_build_points,
+            )
+                .chain(),
         );
-        app.add_systems(Update, (characters::chicken::animate_chicken).chain());
-        //app.add_systems(OnExit(GlobalState::ActiveLevel), ());
+        app.add_systems(
+            Update,
+            (
+                buildings::animate_turrets,
+                buildings::animate_spawners,
+                buildings::fire_turrets,
+                buildings::spawn_minions,
+                minions::handle_damage,
+                minions::animate_minions,
+                minions::move_minions,
+            )
+                .chain(),
+        );
     }
 }
 
