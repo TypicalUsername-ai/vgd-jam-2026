@@ -1,5 +1,5 @@
-use super::SpawnerPoint;
-use super::TowerPoint;
+use super::BuildPoint;
+use super::TurretPoint;
 use bevy::prelude::*;
 use serde::Deserialize;
 use std::{fs::File, io::Read, path::Path};
@@ -7,8 +7,8 @@ use std::{fs::File, io::Read, path::Path};
 #[derive(Debug, Deserialize, Resource)]
 pub(crate) struct LevelMapConfig {
     pub path_points: Vec<Vec3>,
-    pub spawner_points: Vec<SpawnerPoint>,
-    pub tower_points: Vec<TowerPoint>,
+    pub spawner_points: Vec<BuildPoint>,
+    pub tower_points: Vec<TurretPoint>,
 }
 
 impl From<&Path> for LevelMapConfig {

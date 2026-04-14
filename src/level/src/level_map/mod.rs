@@ -1,37 +1,20 @@
-use bevy::prelude::*;
-use std::path::PathBuf;
+mod build_point;
+mod map_background;
 mod map_config;
-mod path;
-mod spawner_point;
-mod tower_point;
-use crate::{level_map::path::walk_mobs, tiles};
+mod turret_point;
+use bevy::prelude::*;
 use state::{GlobalState, LevelState};
 
-pub(crate) use map_config::LevelMapConfig;
-pub(crate) use path::PathWalker;
-pub(crate) use spawner_point::SpawnerPoint;
-pub(crate) use tower_point::TowerPoint;
+use build_point::BuildPoint;
+pub(crate) use build_point::setup_build_points;
+pub(crate) use map_background::setup_background;
+use map_config::LevelMapConfig;
+use turret_point::TurretPoint;
+pub(crate) use turret_point::setup_turrets;
 
-pub(crate) struct MapPlugin {
-    pub(crate) maps_directory: PathBuf,
-}
-
-impl Plugin for MapPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(
-            OnEnter(GlobalState::ActiveLevel),
-            (
-                load_level,
-                tiles::spawn_soil_path,
-                tiles::spawn_build_locations,
-            )
-                .chain(),
-        );
-        app.add_systems(Update, walk_mobs.run_if(in_state(GlobalState::ActiveLevel)));
-    }
-}
-
-fn load_level(mut commands: Commands, current_level: Res<State<LevelState>>) {
+/// Loads the level based on current [LevelState] resource
+/// requires [Commands] for inserting a [LevelMapConfig] resource
+pub(crate) fn load_level(mut commands: Commands, current_level: Res<State<LevelState>>) {
     match &**current_level {
         LevelState::Active {
             id: _,
