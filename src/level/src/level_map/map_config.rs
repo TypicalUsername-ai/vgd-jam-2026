@@ -16,8 +16,8 @@ pub(crate) struct LevelMapConfig {
     pub tower_points: Vec<TurretPoint>,
 }
 
-#[must_use("Load configs from .ron files!")]
 impl From<&Path> for LevelMapConfig {
+    #[must_use = "Load configs from .ron files!"]
     fn from(value: &Path) -> Self {
         let config = File::open(value);
         match config {
