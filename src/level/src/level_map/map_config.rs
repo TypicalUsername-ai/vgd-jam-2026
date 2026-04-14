@@ -4,13 +4,19 @@ use bevy::prelude::*;
 use serde::Deserialize;
 use std::{fs::File, io::Read, path::Path};
 
+/// used to configure the initial map state and resource locations for a given level
+/// handles necessary components for each level:
 #[derive(Debug, Deserialize, Resource)]
 pub(crate) struct LevelMapConfig {
+    /// set of points which connected make the path minions have to walk
     pub path_points: Vec<Vec3>,
+    /// holds all [BuildPoint] locations
     pub spawner_points: Vec<BuildPoint>,
+    /// hold locations of all [TowerPoint]s
     pub tower_points: Vec<TurretPoint>,
 }
 
+#[must_use("Load configs from .ron files!")]
 impl From<&Path> for LevelMapConfig {
     fn from(value: &Path) -> Self {
         let config = File::open(value);
