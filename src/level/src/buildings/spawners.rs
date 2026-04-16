@@ -77,7 +77,7 @@ impl SpawnerAnimationState {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Hash, PartialEq, Eq, serde::Deserialize)]
 pub(crate) enum SpawnerAnimation {
     #[default]
     None,

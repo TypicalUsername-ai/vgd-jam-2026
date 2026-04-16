@@ -1,4 +1,4 @@
-use bevy::{camera::visibility::RenderLayers, prelude::*};
+use bevy::{asset::io::embedded::GetAssetServer, camera::visibility::RenderLayers, prelude::*};
 use state::GlobalState;
 
 mod buildings;
@@ -23,8 +23,14 @@ pub(crate) fn setup_camera(mut commands: Commands) {
 impl Plugin for CharacterSelectPlugin {
     fn build(&self, app: &mut App) {
         //app.init_resource::<MinionHandles>();
-        app.insert_resource(buildings::SpawnerConfigs::init());
-        app.insert_resource(buildings::TurretConfigs::init());
+        app.insert_resource(buildings::SpawnerConfigs::init(
+            vec![],
+            app.get_asset_server(),
+        ));
+        app.insert_resource(buildings::TurretConfigs::init(
+            vec![],
+            app.get_asset_server(),
+        ));
         app.add_systems(
             OnEnter(GlobalState::ActiveLevel),
             (
