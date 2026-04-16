@@ -28,8 +28,6 @@ impl Plugin for CharacterSelectPlugin {
         app.add_systems(
             OnEnter(GlobalState::ActiveLevel),
             (
-                buildings::register_turrets,
-                buildings::register_spawners,
                 level_map::load_level,
                 level_map::setup_background,
                 level_map::setup_turrets,
