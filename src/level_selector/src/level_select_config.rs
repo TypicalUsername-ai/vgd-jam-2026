@@ -1,6 +1,5 @@
 use crate::LevelConfiguration;
 use bevy::prelude::*;
-use ron;
 use serde::Deserialize;
 use std::{
     fs::File,
