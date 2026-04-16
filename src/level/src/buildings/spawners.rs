@@ -1,10 +1,4 @@
-use super::spawner::{SpawnerAnimationState, SpawnerBuilding};
 use bevy::prelude::*;
-
-/// registers all of the available spawner building types
-pub(crate) fn register_spawners() {
-    todo!()
-}
 
 /// animates all of the currently built spawner buildings
 pub(crate) fn animate_spawners(
@@ -20,7 +14,7 @@ pub(crate) fn animate_spawners(
         // tick every animation timer
         spawner_anim.animation_timer.tick(time.delta());
         if spawner_anim.animation_timer.is_finished() {
-            let mut atlas = sprite
+            let atlas = sprite
                 .texture_atlas
                 .as_mut()
                 .expect("Tower should have a texture atlas!");
@@ -28,7 +22,6 @@ pub(crate) fn animate_spawners(
             // progress to next frame in atlas layout
             let (color, sprite_idx) = spawner_anim.next_frame();
             atlas.index = sprite_idx;
-            drop(atlas);
             sprite.color = color;
         }
     }
@@ -44,7 +37,50 @@ pub(crate) fn spawn_minions(
         // progress time for each spawner
         spawner.spawn_timer.tick(time.delta());
         if spawner.spawn_timer.is_finished() {
-            warn!("should spawn {:?}!", entity)
+            warn!("should spawn {:?}!", entity);
+            (spawner.spawn_function)(&mut commands, transform.translation);
         }
     }
+}
+
+#[derive(Debug, Component)]
+pub(crate) struct SpawnerBuilding {
+    pub spawn_timer: Timer,
+    pub spawn_function: fn(cmds: &mut Commands, pos: Vec3),
+}
+
+#[derive(Debug, Component)]
+pub(crate) struct SpawnerAnimationState {
+    pub animation_timer: Timer,
+    current_frame: usize,
+    color: Color,
+    pub action: SpawnerAnimation,
+    // needs current atlas position etc
+}
+
+impl SpawnerAnimationState {
+    pub fn next_frame(&mut self) -> (Color, usize) {
+        match self.action {
+            SpawnerAnimation::None => (),
+            SpawnerAnimation::JustBuilt(start, end) => {
+                self.current_frame = ((self.current_frame + 1) % end).max(start);
+            }
+            SpawnerAnimation::UpgradeReady => {
+                if self.color == Color::WHITE {
+                    self.color = Color::BLACK;
+                } else {
+                    self.color = Color::WHITE;
+                }
+            }
+        }
+        (self.color, self.current_frame)
+    }
+}
+
+#[derive(Debug, Default)]
+pub(crate) enum SpawnerAnimation {
+    #[default]
+    None,
+    JustBuilt(usize, usize), // a sprite animation
+    UpgradeReady,            // just blinking maybe ??
 }

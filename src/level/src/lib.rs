@@ -1,4 +1,3 @@
-use bevy::color::palettes::basic;
 use bevy::{camera::visibility::RenderLayers, prelude::*};
 use state::GlobalState;
 
@@ -24,6 +23,8 @@ pub(crate) fn setup_camera(mut commands: Commands) {
 impl Plugin for CharacterSelectPlugin {
     fn build(&self, app: &mut App) {
         //app.init_resource::<MinionHandles>();
+        app.insert_resource(buildings::SpawnerConfigs::init());
+        app.insert_resource(buildings::TurretConfigs::init());
         app.add_systems(
             OnEnter(GlobalState::ActiveLevel),
             (
