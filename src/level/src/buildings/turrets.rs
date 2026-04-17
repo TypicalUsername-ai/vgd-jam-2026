@@ -13,11 +13,12 @@ pub(crate) fn fire_turrets() {
 #[derive(Debug, Component)]
 pub(crate) struct Turret {
     pub shot_timer: Timer,
-    pub damage: f64,
-    current_target: Option<Entity>,
+    pub damage: f32,
+    pub range: f32,
+    pub shoot_function: fn(cmds: &mut Commands, target: Entity),
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, serde::Deserialize, Hash, PartialEq, Eq)]
 pub(crate) enum TurretAnimation {
     #[default]
     Idle,
