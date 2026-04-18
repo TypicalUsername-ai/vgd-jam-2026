@@ -1,9 +1,11 @@
 use bevy::{asset::io::embedded::GetAssetServer, camera::visibility::RenderLayers, prelude::*};
 use state::GlobalState;
 
+mod animation;
 mod buildings;
 mod level_map;
 mod minions;
+use animation::{Action, AnimationState};
 
 pub struct CharacterSelectPlugin {}
 
