@@ -1,4 +1,5 @@
-use super::turrets::{Turret, TurretAnimation};
+use super::turrets::Turret;
+use crate::Action;
 use bevy::prelude::*;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -11,14 +12,14 @@ pub(crate) struct TurretConfig {
     building: Turret,
     sprite: Handle<Image>,
     animations: Handle<TextureAtlasLayout>,
-    atlas_rows: HashMap<TurretAnimation, usize>,
+    atlas_rows: HashMap<Action, usize>,
 }
 
 #[derive(Debug, Resource)]
 pub(crate) struct TurretConfigs(HashMap<String, TurretConfig>);
 
 impl TurretConfigs {
-    pub(crate) fn init(config_paths: Vec<PathBuf>, asset_server: &AssetServer) -> Self {
+    pub(crate) fn init(config_paths: &Vec<PathBuf>, asset_server: &AssetServer) -> Self {
         let hmap = config_paths
             .iter()
             .map(|p| {
@@ -57,7 +58,7 @@ struct TurretConfigKeys {
     shot_time: f32,
     damage: f32,
     range: f32,
-    animations: Vec<(TurretAnimation, usize)>,
+    animations: Vec<(Action, usize)>,
     sprite_path: PathBuf,
     tile_size: UVec2,
     //projectile_config_path: PathBuf,

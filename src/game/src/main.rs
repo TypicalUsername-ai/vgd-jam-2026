@@ -1,7 +1,9 @@
+use std::path::PathBuf;
+
 use bevy::prelude::*;
 #[cfg(feature = "inspector")]
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
-use level::CharacterSelectPlugin;
+use level::LevelPlugin;
 use level_selector::LevelSelectPlugin;
 use main_menu::MainMenuPlugin;
 use state::GameStatePlugin;
@@ -24,7 +26,10 @@ fn main() {
     .add_plugins(GameStatePlugin {})
     .add_plugins(MainMenuPlugin {})
     .add_plugins(LevelSelectPlugin::from(config))
-    .add_plugins(CharacterSelectPlugin {});
+    .add_plugins(LevelPlugin::new(
+        PathBuf::from("../assets/buildings"),
+        PathBuf::from("../assets/turrets"),
+    ));
 
     #[cfg(feature = "inspector")]
     app.add_plugins(EguiPlugin::default())

@@ -3,12 +3,12 @@ mod map_background;
 mod map_config;
 mod turret_point;
 use bevy::prelude::*;
-use state::{GlobalState, LevelState};
+use state::LevelState;
 
 use build_point::BuildPoint;
 pub(crate) use build_point::setup_build_points;
 pub(crate) use map_background::setup_background;
-use map_config::LevelMapConfig;
+pub(crate) use map_config::LevelMapConfig;
 use turret_point::TurretPoint;
 pub(crate) use turret_point::setup_turrets;
 
@@ -23,6 +23,6 @@ pub(crate) fn load_level(mut commands: Commands, current_level: Res<State<LevelS
             let map_conf = map_config::LevelMapConfig::from(map_config_path.as_path());
             commands.insert_resource(map_conf);
         }
-        _ => todo!(),
+        _ => unreachable!(),
     };
 }

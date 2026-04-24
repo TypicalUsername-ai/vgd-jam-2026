@@ -1,13 +1,18 @@
 use bevy::{asset::io::embedded::GetAssetServer, camera::visibility::RenderLayers, prelude::*};
 use state::GlobalState;
+use std::path::PathBuf;
 
 mod animation;
 mod buildings;
 mod level_map;
 mod minions;
 use animation::{Action, AnimationState};
+use level_map::LevelMapConfig;
 
-pub struct CharacterSelectPlugin {}
+pub struct LevelPlugin {
+    spawner_configs: Vec<PathBuf>,
+    turret_configs: Vec<PathBuf>,
+}
 
 #[derive(Debug, Component)]
 pub struct LevelCamera {}
@@ -22,15 +27,14 @@ pub(crate) fn setup_camera(mut commands: Commands) {
     ));
 }
 
-impl Plugin for CharacterSelectPlugin {
+impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        //app.init_resource::<MinionHandles>();
         app.insert_resource(buildings::SpawnerConfigs::init(
-            vec![],
+            &self.spawner_configs,
             app.get_asset_server(),
         ));
         app.insert_resource(buildings::TurretConfigs::init(
-            vec![],
+            &self.turret_configs,
             app.get_asset_server(),
         ));
         app.add_systems(
@@ -46,17 +50,56 @@ impl Plugin for CharacterSelectPlugin {
         app.add_systems(
             Update,
             (
-                buildings::animate_turrets,
-                buildings::animate_spawners,
                 buildings::fire_turrets,
                 buildings::spawn_minions,
-                minions::handle_damage,
-                minions::animate_minions,
+                //minions::handle_damage, // or move handle damage to turret firing action
                 minions::move_minions,
+                animation::animate_all,
             )
-                .chain(),
+                .chain()
+                .run_if(in_state(GlobalState::ActiveLevel).and(resource_exists::<LevelMapConfig>)),
         );
     }
 }
 
-pub struct LevelPlugin {}
+impl LevelPlugin {
+    #[must_use]
+    pub fn new(spawner_configs_path: PathBuf, turret_configs_path: PathBuf) -> Self {
+        let spawner_configs = spawner_configs_path
+            .read_dir()
+            .expect("spawner configs path is a directory")
+            .filter_map(|e| {
+                // dont need to check for exists as we enumerate a directory
+                if let Ok(f) = e
+                    && f.path().extension().is_some_and(|e| e == "ron")
+                {
+                    Some(f.path())
+                } else {
+                    // Dir entry is invalid
+                    None
+                }
+            })
+            .collect();
+
+        let turret_configs = turret_configs_path
+            .read_dir()
+            .expect("turret configs path is a directory")
+            .filter_map(|e| {
+                // dont need to check for exists as we enumerate a directory
+                if let Ok(f) = e
+                    && f.path().extension().is_some_and(|e| e == "ron")
+                {
+                    Some(f.path())
+                } else {
+                    // Dir entry is invalid
+                    None
+                }
+            })
+            .collect();
+
+        Self {
+            spawner_configs,
+            turret_configs,
+        }
+    }
+}

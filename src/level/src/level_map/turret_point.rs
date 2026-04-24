@@ -12,5 +12,7 @@ pub(crate) struct TurretPoint {
 
 /// spawns all of the turrets at the locations specified in [LevelMapConfig]
 pub(crate) fn setup_turrets(mut commands: Commands, level_config: Res<LevelMapConfig>) {
-    todo!()
+    for turret_config in level_config.tower_points.iter() {
+        todo!()
+    }
 }

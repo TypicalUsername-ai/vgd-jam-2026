@@ -4,6 +4,6 @@ mod turret_config;
 mod turrets;
 
 pub(crate) use spawner_config::SpawnerConfigs;
-pub(crate) use spawners::{animate_spawners, spawn_minions};
+pub(crate) use spawners::{SpawnerBuilding, spawn_minions};
 pub(crate) use turret_config::TurretConfigs;
-pub(crate) use turrets::{animate_turrets, fire_turrets};
+pub(crate) use turrets::fire_turrets;

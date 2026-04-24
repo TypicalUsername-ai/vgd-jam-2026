@@ -1,4 +1,5 @@
-use super::spawners::{SpawnerAnimation, SpawnerBuilding};
+use super::spawners::{SpawnerBuilding, SpawnerKind};
+use crate::Action;
 use bevy::prelude::*;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -11,22 +12,19 @@ pub(crate) struct SpawnerBuildingConfig {
     building: SpawnerBuilding,
     sprite: Handle<Image>,
     animations: Handle<TextureAtlasLayout>,
-    atlas_rows: HashMap<SpawnerAnimation, usize>,
+    atlas_rows: HashMap<Action, usize>,
 }
 
 #[derive(Debug, Resource)]
-pub(crate) struct SpawnerConfigs(HashMap<String, SpawnerBuildingConfig>);
+pub(crate) struct SpawnerConfigs(HashMap<SpawnerKind, SpawnerBuildingConfig>);
 
 impl SpawnerConfigs {
-    pub(crate) fn init(config_paths: Vec<PathBuf>, asset_server: &AssetServer) -> Self {
+    pub(crate) fn init(config_paths: &Vec<PathBuf>, asset_server: &AssetServer) -> Self {
         let hmap = config_paths
             .iter()
             .map(|p| {
                 let sck = SpawnerConfigKeys::from(p);
-                (
-                    sck.name.clone(),
-                    SpawnerBuildingConfig::build(sck, asset_server),
-                )
+                (sck.kind, SpawnerBuildingConfig::build(sck, asset_server))
             })
             .collect();
         SpawnerConfigs(hmap)
@@ -38,6 +36,7 @@ impl SpawnerBuildingConfig {
         let rows = value.animations.len();
         let cols = value.animations.iter().map(|a| a.1).max().unwrap_or(0);
         let building = SpawnerBuilding {
+            spawner_kind: value.kind,
             spawn_timer: Timer::from_seconds(value.spawn_time, TimerMode::Repeating),
             spawn_function: |_, _| todo!(),
         };
@@ -54,9 +53,9 @@ impl SpawnerBuildingConfig {
 
 #[derive(Debug, Deserialize)]
 struct SpawnerConfigKeys {
-    name: String,
+    kind: SpawnerKind,
     spawn_time: f32,
-    animations: Vec<(SpawnerAnimation, usize)>,
+    animations: Vec<(Action, usize)>,
     sprite_path: PathBuf,
     tile_size: UVec2,
     minion_config_path: PathBuf,
