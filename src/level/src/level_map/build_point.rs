@@ -1,8 +1,9 @@
-use crate::buildings::SpawnerBuilding;
+use crate::buildings::{SpawnerBuilding, SpawnerConfigs};
 use bevy::{ecs::relationship::RelatedSpawnerCommands, prelude::*};
 use serde::Deserialize;
 
-use crate::level_map::map_config::LevelMapConfig;
+use super::map_config::LevelMapConfig;
+use crate::buildings::SpawnerKind;
 
 /// a single point which can hold a single spawner
 #[derive(Debug, Deserialize)]
@@ -16,10 +17,19 @@ pub(crate) struct BuildPoint {
 pub(crate) struct BuildingSpot {}
 
 /// spawns marker entities for which locations will be able to have spawners built on
-pub(crate) fn setup_build_points(mut commands: Commands, level_config: Res<LevelMapConfig>) {
+pub(crate) fn setup_build_points(
+    mut commands: Commands,
+    level_config: Res<LevelMapConfig>,
+    spawner_configs: Res<SpawnerConfigs>,
+) {
     for spawn_point in level_config.spawner_points.iter() {
         commands
-            .spawn(SpawnerBuilding::init(spawn_point.position))
+            .spawn(SpawnerBuilding::init(
+                spawn_point.position,
+                spawner_configs
+                    .get(&SpawnerKind::None)
+                    .expect("Default config has to exist"),
+            ))
             .observe(build_spot_menu);
     }
 }

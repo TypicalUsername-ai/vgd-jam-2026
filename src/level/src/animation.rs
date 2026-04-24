@@ -15,8 +15,11 @@ impl AnimationState {
     }
 }
 
-#[derive(Debug, serde::Deserialize, Hash, PartialEq, Eq)]
-pub enum Action {}
+#[derive(Debug, Default, serde::Deserialize, Hash, PartialEq, Eq)]
+pub enum Action {
+    #[default]
+    Idle,
+}
 
 pub(crate) fn animate_all(mut query: Query<(&mut AnimationState, &mut Sprite)>, time: Res<Time>) {
     for (mut anim, mut sprite) in query.iter_mut() {
@@ -24,5 +27,18 @@ pub(crate) fn animate_all(mut query: Query<(&mut AnimationState, &mut Sprite)>, 
         if anim.animation_timer.just_finished() {
             anim.next_frame(&mut sprite);
         }
+    }
+}
+
+#[derive(Debug)]
+pub struct ActionLocation {
+    pub row: usize,
+    pub len: usize,
+}
+
+impl ActionLocation {
+    #[must_use]
+    pub fn new(row: usize, len: usize) -> Self {
+        Self { row, len }
     }
 }

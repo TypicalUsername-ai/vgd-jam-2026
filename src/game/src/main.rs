@@ -29,6 +29,7 @@ fn main() {
     .add_plugins(LevelPlugin::new(
         PathBuf::from("../assets/buildings"),
         PathBuf::from("../assets/turrets"),
+        PathBuf::from("../assets/minions"),
     ));
 
     #[cfg(feature = "inspector")]

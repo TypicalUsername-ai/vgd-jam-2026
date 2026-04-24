@@ -12,6 +12,7 @@ use level_map::LevelMapConfig;
 pub struct LevelPlugin {
     spawner_configs: Vec<PathBuf>,
     turret_configs: Vec<PathBuf>,
+    minion_configs: Vec<PathBuf>,
 }
 
 #[derive(Debug, Component)]
@@ -35,6 +36,10 @@ impl Plugin for LevelPlugin {
         ));
         app.insert_resource(buildings::TurretConfigs::init(
             &self.turret_configs,
+            app.get_asset_server(),
+        ));
+        app.insert_resource(minions::MinionConfigs::init(
+            &self.minion_configs,
             app.get_asset_server(),
         ));
         app.add_systems(
@@ -64,42 +69,32 @@ impl Plugin for LevelPlugin {
 
 impl LevelPlugin {
     #[must_use]
-    pub fn new(spawner_configs_path: PathBuf, turret_configs_path: PathBuf) -> Self {
-        let spawner_configs = spawner_configs_path
-            .read_dir()
-            .expect("spawner configs path is a directory")
-            .filter_map(|e| {
-                // dont need to check for exists as we enumerate a directory
-                if let Ok(f) = e
-                    && f.path().extension().is_some_and(|e| e == "ron")
-                {
-                    Some(f.path())
-                } else {
-                    // Dir entry is invalid
-                    None
-                }
-            })
-            .collect();
-
-        let turret_configs = turret_configs_path
-            .read_dir()
-            .expect("turret configs path is a directory")
-            .filter_map(|e| {
-                // dont need to check for exists as we enumerate a directory
-                if let Ok(f) = e
-                    && f.path().extension().is_some_and(|e| e == "ron")
-                {
-                    Some(f.path())
-                } else {
-                    // Dir entry is invalid
-                    None
-                }
-            })
-            .collect();
-
+    pub fn new(
+        spawner_configs_path: PathBuf,
+        turret_configs_path: PathBuf,
+        minion_configs_path: PathBuf,
+    ) -> Self {
         Self {
-            spawner_configs,
-            turret_configs,
+            spawner_configs: read_configs_dir(spawner_configs_path),
+            turret_configs: read_configs_dir(turret_configs_path),
+            minion_configs: read_configs_dir(minion_configs_path),
         }
     }
+}
+
+fn read_configs_dir(dir: PathBuf) -> Vec<PathBuf> {
+    dir.read_dir()
+        .expect("configs path is a directory")
+        .filter_map(|e| {
+            // dont need to check for exists as we enumerate a directory
+            if let Ok(f) = e
+                && f.path().extension().is_some_and(|e| e == "ron")
+            {
+                Some(f.path())
+            } else {
+                // Dir entry is invalid
+                None
+            }
+        })
+        .collect()
 }

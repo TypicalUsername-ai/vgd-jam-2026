@@ -12,7 +12,11 @@ pub struct Minion {
     // same ^^ sprite_index: usize,
 }
 
-pub enum MinionKind {
+impl Minion {}
+
+#[derive(Debug, serde::Deserialize, Hash, PartialEq, Eq, Clone, Copy)]
+pub(crate) enum MinionKind {
+    None,
     Chicken,
 }
 

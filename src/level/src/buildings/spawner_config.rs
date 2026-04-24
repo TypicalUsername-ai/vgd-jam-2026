@@ -1,21 +1,24 @@
 use super::spawners::{SpawnerBuilding, SpawnerKind};
 use crate::Action;
+use crate::animation::ActionLocation;
+use crate::minions::MinionKind;
 use bevy::prelude::*;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
+use std::ops::Range;
 use std::path::PathBuf;
 
 #[derive(Debug)]
 pub(crate) struct SpawnerBuildingConfig {
-    building: SpawnerBuilding,
-    sprite: Handle<Image>,
-    animations: Handle<TextureAtlasLayout>,
-    atlas_rows: HashMap<Action, usize>,
+    pub building: SpawnerBuilding,
+    pub sprite: Handle<Image>,
+    pub animations: Handle<TextureAtlasLayout>,
+    pub atlas_rows: HashMap<Action, ActionLocation>,
 }
 
-#[derive(Debug, Resource)]
+#[derive(Debug, Resource, Deref)]
 pub(crate) struct SpawnerConfigs(HashMap<SpawnerKind, SpawnerBuildingConfig>);
 
 impl SpawnerConfigs {
@@ -38,7 +41,7 @@ impl SpawnerBuildingConfig {
         let building = SpawnerBuilding {
             spawner_kind: value.kind,
             spawn_timer: Timer::from_seconds(value.spawn_time, TimerMode::Repeating),
-            spawn_function: |_, _| todo!(),
+            spawned_minion: value.spawned_minion,
         };
         let atlas_layout =
             TextureAtlasLayout::from_grid(value.tile_size, cols as u32, rows as u32, None, None);
@@ -46,19 +49,25 @@ impl SpawnerBuildingConfig {
             building,
             sprite: asset_server.load(value.sprite_path),
             animations: asset_server.add(atlas_layout),
-            atlas_rows: value.animations.into_iter().collect(),
+            atlas_rows: value
+                .animations
+                .into_iter()
+                .enumerate()
+                .map(|(row, (action, len))| (action, ActionLocation::new(row, len)))
+                .collect(),
         }
     }
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename = "SpawnerConfig")]
 struct SpawnerConfigKeys {
     kind: SpawnerKind,
     spawn_time: f32,
     animations: Vec<(Action, usize)>,
     sprite_path: PathBuf,
     tile_size: UVec2,
-    minion_config_path: PathBuf,
+    spawned_minion: MinionKind,
 }
 
 impl From<&PathBuf> for SpawnerConfigKeys {
