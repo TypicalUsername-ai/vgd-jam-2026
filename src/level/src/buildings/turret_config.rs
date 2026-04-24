@@ -1,5 +1,6 @@
 use super::turrets::Turret;
 use crate::Action;
+use crate::animation::ActionLocation;
 use bevy::prelude::*;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -12,7 +13,7 @@ pub(crate) struct TurretConfig {
     building: Turret,
     sprite: Handle<Image>,
     animations: Handle<TextureAtlasLayout>,
-    atlas_rows: HashMap<Action, usize>,
+    atlas_rows: HashMap<Action, ActionLocation>,
 }
 
 #[derive(Debug, Resource)]
@@ -47,7 +48,12 @@ impl TurretConfig {
             building,
             sprite: asset_server.load(value.sprite_path),
             animations: asset_server.add(atlas_layout),
-            atlas_rows: value.animations.into_iter().collect(),
+            atlas_rows: value
+                .animations
+                .into_iter()
+                .enumerate()
+                .map(|(idx, (action, len))| (action, ActionLocation::new(idx, len)))
+                .collect(),
         }
     }
 }

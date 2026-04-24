@@ -1,5 +1,5 @@
 use super::minion::MinionKind;
-use crate::animation::Action;
+use crate::animation::{Action, ActionLocation};
 use bevy::prelude::*;
 use std::collections::HashMap;
 use std::fs::File;
@@ -13,7 +13,7 @@ pub(crate) struct MinionConfig {
     pub base_speed: f32,
     pub sprite: Handle<Image>,
     pub animations: Handle<TextureAtlasLayout>,
-    pub atlas_rows: HashMap<Action, usize>,
+    pub atlas_rows: HashMap<Action, ActionLocation>,
 }
 
 impl MinionConfig {
@@ -32,7 +32,12 @@ impl MinionConfig {
             base_speed: value.speed,
             sprite: asset_server.load(value.sprite_path),
             animations: asset_server.add(atlas_layout),
-            atlas_rows: value.animations.into_iter().collect(),
+            atlas_rows: value
+                .animations
+                .into_iter()
+                .enumerate()
+                .map(|(idx, (action, len))| (action, ActionLocation::new(idx, len)))
+                .collect(),
         }
     }
 }
