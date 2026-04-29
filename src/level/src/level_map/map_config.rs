@@ -1,4 +1,5 @@
-use super::BuildPoint;
+use crate::buildings::HeroKind;
+
 use super::TurretPoint;
 use bevy::prelude::*;
 use serde::Deserialize;
@@ -14,10 +15,10 @@ use std::{
 pub(crate) struct LevelMapConfig {
     /// set of points which connected make the path minions have to walk
     pub path_points: Vec<Vec3>,
-    /// holds all [BuildPoint] locations
-    pub spawner_points: Vec<BuildPoint>,
     /// hold locations of all [TowerPoint]s
     pub tower_points: Vec<TurretPoint>,
+    /// all [HeroKind] available for a given level
+    pub available_heroes: Vec<HeroKind>,
     /// background color for level
     pub bg_color: Color,
     /// background sprite for level backdrop

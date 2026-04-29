@@ -1,14 +1,16 @@
-mod build_point;
+mod hero_slots;
 mod map_background;
 mod map_config;
+mod path;
 mod turret_point;
 use bevy::prelude::*;
 use state::LevelState;
 
-use build_point::BuildPoint;
-pub(crate) use build_point::setup_build_points;
+pub(crate) use hero_slots::HeroSlot;
+pub(crate) use hero_slots::setup_hero_slots;
 pub(crate) use map_background::setup_background;
 pub(crate) use map_config::LevelMapConfig;
+pub(crate) use path::setup_path;
 use turret_point::TurretPoint;
 pub(crate) use turret_point::setup_turrets;
 

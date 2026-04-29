@@ -27,7 +27,7 @@ fn main() {
     .add_plugins(MainMenuPlugin {})
     .add_plugins(LevelSelectPlugin::from(config))
     .add_plugins(LevelPlugin::new(
-        PathBuf::from("../assets/buildings"),
+        PathBuf::from("../assets/heroes"),
         PathBuf::from("../assets/turrets"),
         PathBuf::from("../assets/minions"),
     ));

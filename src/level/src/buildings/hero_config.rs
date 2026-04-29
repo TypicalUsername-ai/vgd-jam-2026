@@ -1,4 +1,4 @@
-use super::spawners::{SpawnerBuilding, SpawnerKind};
+use super::heroes::{ActiveHero, HeroKind};
 use crate::Action;
 use crate::animation::ActionLocation;
 use crate::minions::MinionKind;
@@ -11,42 +11,42 @@ use std::ops::Range;
 use std::path::PathBuf;
 
 #[derive(Debug)]
-pub(crate) struct SpawnerBuildingConfig {
-    pub building: SpawnerBuilding,
+pub(crate) struct HeroConfig {
+    pub hero: ActiveHero,
     pub sprite: Handle<Image>,
     pub animations: Handle<TextureAtlasLayout>,
     pub atlas_rows: HashMap<Action, ActionLocation>,
 }
 
 #[derive(Debug, Resource, Deref)]
-pub(crate) struct SpawnerConfigs(HashMap<SpawnerKind, SpawnerBuildingConfig>);
+pub(crate) struct HeroConfigs(HashMap<HeroKind, HeroConfig>);
 
-impl SpawnerConfigs {
+impl HeroConfigs {
     pub(crate) fn init(config_paths: &Vec<PathBuf>, asset_server: &AssetServer) -> Self {
         let hmap = config_paths
             .iter()
             .map(|p| {
-                let sck = SpawnerConfigKeys::from(p);
-                (sck.kind, SpawnerBuildingConfig::build(sck, asset_server))
+                let sck = HeroConfigKeys::from(p);
+                (sck.kind, HeroConfig::build(sck, asset_server))
             })
             .collect();
-        SpawnerConfigs(hmap)
+        HeroConfigs(hmap)
     }
 }
 
-impl SpawnerBuildingConfig {
-    fn build(value: SpawnerConfigKeys, asset_server: &AssetServer) -> Self {
+impl HeroConfig {
+    fn build(value: HeroConfigKeys, asset_server: &AssetServer) -> Self {
         let rows = value.animations.len();
         let cols = value.animations.iter().map(|a| a.1).max().unwrap_or(0);
-        let building = SpawnerBuilding {
+        let hero = ActiveHero {
             spawner_kind: value.kind,
             spawn_timer: Timer::from_seconds(value.spawn_time, TimerMode::Repeating),
             spawned_minion: value.spawned_minion,
         };
         let atlas_layout =
             TextureAtlasLayout::from_grid(value.tile_size, cols as u32, rows as u32, None, None);
-        SpawnerBuildingConfig {
-            building,
+        Self {
+            hero,
             sprite: asset_server.load(value.sprite_path),
             animations: asset_server.add(atlas_layout),
             atlas_rows: value
@@ -60,9 +60,9 @@ impl SpawnerBuildingConfig {
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename = "SpawnerConfig")]
-struct SpawnerConfigKeys {
-    kind: SpawnerKind,
+#[serde(rename = "HeroConfig")]
+struct HeroConfigKeys {
+    kind: HeroKind,
     spawn_time: f32,
     animations: Vec<(Action, usize)>,
     sprite_path: PathBuf,
@@ -70,7 +70,7 @@ struct SpawnerConfigKeys {
     spawned_minion: MinionKind,
 }
 
-impl From<&PathBuf> for SpawnerConfigKeys {
+impl From<&PathBuf> for HeroConfigKeys {
     fn from(value: &PathBuf) -> Self {
         let config = File::open(value);
         match config {

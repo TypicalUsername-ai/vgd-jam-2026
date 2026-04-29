@@ -19,6 +19,10 @@ impl AnimationState {
 pub enum Action {
     #[default]
     Idle,
+    WalkUp,
+    WalkDown,
+    WalkLeft,
+    WalkRight,
 }
 
 pub(crate) fn animate_all(mut query: Query<(&mut AnimationState, &mut Sprite)>, time: Res<Time>) {

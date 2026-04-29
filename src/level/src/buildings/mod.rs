@@ -1,9 +1,9 @@
-mod spawner_config;
-mod spawners;
+mod hero_config;
+mod heroes;
 mod turret_config;
 mod turrets;
 
-pub(crate) use spawner_config::SpawnerConfigs;
-pub(crate) use spawners::{SpawnerBuilding, SpawnerKind, spawn_minions};
+pub(crate) use hero_config::HeroConfigs;
+pub(crate) use heroes::{ActiveHero, HeroKind, spawn_minions};
 pub(crate) use turret_config::TurretConfigs;
 pub(crate) use turrets::fire_turrets;

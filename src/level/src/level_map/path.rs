@@ -1,63 +1,22 @@
 use super::LevelMapConfig;
-use crate::characters::utils::{AnimationState, Facing};
-use bevy::prelude::*;
+use bevy::{math::VectorSpace, prelude::*};
 
-#[derive(Debug, Component)]
-pub(crate) struct PathWalker {
-    pub timer: Timer,
-    pub speed: f32,
-    pub segment: usize,
-}
-
-impl std::default::Default for PathWalker {
-    fn default() -> Self {
-        Self {
-            timer: Timer::from_seconds(0.25, TimerMode::Repeating),
-            speed: 5.0,
-            segment: 0,
-        }
-    }
-}
-
-pub(crate) fn walk_mobs(
-    _commands: Commands,
-    time: Res<Time>,
-    mobs_query: Query<(&mut PathWalker, &mut Transform, &mut AnimationState), With<PathWalker>>,
-    map_config: Res<LevelMapConfig>,
+pub(crate) fn setup_path(
+    mut commands: Commands,
+    level_config: Res<LevelMapConfig>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    for (mut walker, mut transform, mut state) in mobs_query {
-        // advance time
-        walker.timer.tick(time.delta());
-        // check if timer ticked to progress
-        if walker.timer.just_finished() {
-            //info!("Walk timer firing!");
-            // segment nr means to which point youre going
-            if let Some(segment_end) = map_config.path_points.get(walker.segment)
-                && state.moving
-            {
-                let tgt = segment_end.with_z(transform.translation.z);
-                let face = Facing::from(tgt - transform.translation);
-                if face != state.facing {
-                    state.facing = face;
-                }
-                //info!("Current position: {}", transform.translation);
-                let overshoot = tgt.distance(transform.translation) - walker.speed;
-                if overshoot >= 0.0 {
-                    transform.translation = transform.translation.move_towards(tgt, walker.speed);
-                } else {
-                    walker.segment += 1;
-                    if walker.segment < map_config.path_points.len() {
-                        let new_tgt = map_config
-                            .path_points
-                            .get(walker.segment)
-                            .expect("Length bounds were just checked")
-                            .with_z(transform.translation.z);
-                        transform.translation = tgt.move_towards(new_tgt, -overshoot)
-                    } else {
-                        state.moving = false;
-                    }
-                }
-            }
-        }
-    }
+    let delta = 10.;
+    let delta_x = Vec3::default().with_x(delta);
+    let delta_y = Vec3::default().with_x(delta);
+    let mesh_points = level_config.path_points.iter().map(|p| p.xy());
+
+    let mesh_handle = meshes.add(Polyline2d::new(mesh_points));
+    let mat_handle = materials.add(Color::srgb_u8(0, 150, 0));
+    commands.spawn((
+        Mesh2d(mesh_handle),
+        MeshMaterial2d(mat_handle),
+        Transform::from_translation(Vec3::ZERO.with_z(10.)),
+    ));
 }

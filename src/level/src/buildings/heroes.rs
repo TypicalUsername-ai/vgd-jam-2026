@@ -1,6 +1,7 @@
+use crate::level_map::HeroSlot;
 use bevy::prelude::*;
 
-use super::spawner_config::SpawnerBuildingConfig;
+use super::hero_config::HeroConfig;
 use crate::{
     animation::Action,
     level_map::LevelMapConfig,
@@ -13,32 +14,30 @@ pub(crate) fn spawn_minions(
     time: Res<Time>,
     level_config: Res<LevelMapConfig>,
     minion_configs: Res<MinionConfigs>,
-    mut query: Query<(Entity, &mut SpawnerBuilding, &Transform)>,
+    mut query: Query<(&HeroSlot)>,
 ) {
-    for (entity, mut spawner, transform) in query.iter_mut() {
-        // progress time for each spawner
-        spawner.spawn_timer.tick(time.delta());
-        if spawner.spawn_timer.just_finished() && spawner.spawned_minion != MinionKind::None {
-            warn!("should spawn {:?}!", entity);
+    for slot in query.iter() {
+        if let Some(hero) = &slot.hero {
+            // progress time for each spawner
             minion_configs
-                .get(&spawner.spawned_minion)
-                .unwrap_or_else(|| panic!("minion {:?} is not configured", spawner.spawned_minion))
+                .get(&hero.spawned_minion)
+                .unwrap_or_else(|| panic!("minion {:?} is not configured", hero.spawned_minion))
                 .spawn(&mut commands, level_config.path_points[0].clone());
         }
     }
 }
 
 #[derive(Debug, Component, Clone)]
-pub(crate) struct SpawnerBuilding {
-    pub spawner_kind: SpawnerKind,
+pub(crate) struct ActiveHero {
+    pub spawner_kind: HeroKind,
     pub spawn_timer: Timer,
     pub spawned_minion: MinionKind,
 }
 
-impl SpawnerBuilding {
-    pub fn init(position: Vec3, config: &SpawnerBuildingConfig) -> impl Bundle {
+impl ActiveHero {
+    pub fn init(position: Vec3, config: &HeroConfig) -> impl Bundle {
         (
-            config.building.clone(),
+            config.hero.clone(),
             Sprite::from_atlas_image(
                 config.sprite.clone(),
                 TextureAtlas {
@@ -59,8 +58,7 @@ impl SpawnerBuilding {
     }
 }
 
-#[derive(Debug, Default, Clone, Copy, serde::Deserialize, PartialEq, Eq, Hash)]
-pub(crate) enum SpawnerKind {
-    #[default]
-    None,
+#[derive(Debug, Clone, Copy, serde::Deserialize, PartialEq, Eq, Hash)]
+pub(crate) enum HeroKind {
+    Chicken,
 }
