@@ -27,20 +27,27 @@ pub(crate) struct LevelMapConfig {
 
 impl LevelMapConfig {
     pub fn compute_next(&self, speed: f32, distance_covered: f32) -> Vec3 {
-        let mut remaining = distance_covered;
-        self.path_points
-            .iter()
-            .fold(self.path_points[0], |pos, item| {
-                let dist_to_next = item.distance(pos);
-                if dist_to_next > remaining + dist_to_next {
-                    pos.move_towards(item.to_owned(), remaining + dist_to_next)
-                } else {
-                    remaining -= dist_to_next;
-                    item.to_owned()
+        // all distance we need to compute
+        let mut remaining = distance_covered + speed;
+        let mut current_point = 1;
+        while remaining >= f32::EPSILON && current_point < self.path_points.len() {
+            let seg_start = self.path_points[current_point - 1];
+            let seg_end = self.path_points[current_point];
+            let distance = seg_start.distance(seg_end);
+            match remaining
+                .partial_cmp(&distance)
+                .expect("No value should be a NaN")
+            {
+                std::cmp::Ordering::Less => return seg_start.move_towards(seg_end, remaining),
+                std::cmp::Ordering::Equal => return seg_end,
+                std::cmp::Ordering::Greater => {
+                    info!("skipping one segment!");
+                    current_point += 1;
+                    remaining -= distance;
                 }
-            })
-        // find segment
-        // move to +1
+            }
+        }
+        panic!("Movement logic failed");
     }
 }
 

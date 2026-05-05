@@ -30,7 +30,7 @@ pub(crate) fn fire_turrets(
     }
 }
 
-#[derive(Debug, Component)]
+#[derive(Debug, Component, Clone)]
 pub(crate) struct Turret {
     pub shot_timer: Timer,
     pub damage: f32,

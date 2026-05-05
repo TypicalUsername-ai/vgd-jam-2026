@@ -50,6 +50,7 @@ impl Plugin for LevelPlugin {
                 level_map::setup_path,
                 level_map::setup_turrets,
                 level_map::setup_hero_slots,
+                level_map::setup_controls,
             )
                 .chain(),
         );

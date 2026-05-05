@@ -1,5 +1,6 @@
 use super::minion::MinionKind;
 use crate::animation::{Action, ActionLocation};
+use crate::minions::Minion;
 use bevy::prelude::*;
 use std::collections::HashMap;
 use std::fs::File;
@@ -8,9 +9,7 @@ use std::path::PathBuf;
 
 #[derive(Debug)]
 pub(crate) struct MinionConfig {
-    pub kind: MinionKind,
-    pub base_health: f32,
-    pub base_speed: f32,
+    pub minion: Minion,
     pub sprite: Handle<Image>,
     pub animations: Handle<TextureAtlasLayout>,
     pub atlas_rows: HashMap<Action, ActionLocation>,
@@ -18,7 +17,17 @@ pub(crate) struct MinionConfig {
 
 impl MinionConfig {
     pub fn spawn(&self, commands: &mut Commands, spawn_location: Vec3) {
-        todo!()
+        commands.spawn((
+            Sprite::from_atlas_image(
+                self.sprite.clone(),
+                TextureAtlas {
+                    layout: self.animations.clone(),
+                    index: 0,
+                },
+            ),
+            self.minion.clone(),
+            Transform::from_translation(spawn_location),
+        ));
     }
 
     fn build(value: MinionConfigKeys, asset_server: &AssetServer) -> Self {
@@ -27,9 +36,13 @@ impl MinionConfig {
         let atlas_layout =
             TextureAtlasLayout::from_grid(value.tile_size, cols as u32, rows as u32, None, None);
         Self {
-            kind: value.kind,
-            base_health: value.health,
-            base_speed: value.speed,
+            minion: Minion {
+                kind: value.kind,
+                health: value.health,
+                speed: value.speed,
+                distance_traveled: 0.,
+                target_index: 1,
+            },
             sprite: asset_server.load(value.sprite_path),
             animations: asset_server.add(atlas_layout),
             atlas_rows: value

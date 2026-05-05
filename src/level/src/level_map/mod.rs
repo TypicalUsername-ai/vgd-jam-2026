@@ -1,3 +1,4 @@
+mod controls;
 mod hero_slots;
 mod map_background;
 mod map_config;
@@ -6,6 +7,7 @@ mod turret_point;
 use bevy::prelude::*;
 use state::LevelState;
 
+pub(crate) use controls::setup_controls;
 pub(crate) use hero_slots::HeroSlot;
 pub(crate) use hero_slots::setup_hero_slots;
 pub(crate) use map_background::setup_background;
@@ -24,7 +26,10 @@ pub(crate) fn load_level(mut commands: Commands, current_level: Res<State<LevelS
         } => {
             let map_conf = map_config::LevelMapConfig::from(map_config_path.as_path());
             commands.insert_resource(map_conf);
+            info!("added resource");
         }
-        _ => unreachable!(),
+        a => {
+            panic!("actually in resource {:?}", a);
+        }
     };
 }

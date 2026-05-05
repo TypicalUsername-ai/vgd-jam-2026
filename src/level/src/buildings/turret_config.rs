@@ -10,14 +10,14 @@ use std::path::PathBuf;
 
 #[derive(Debug)]
 pub(crate) struct TurretConfig {
-    building: Turret,
-    sprite: Handle<Image>,
-    animations: Handle<TextureAtlasLayout>,
-    atlas_rows: HashMap<Action, ActionLocation>,
+    pub building: Turret,
+    pub sprite: Handle<Image>,
+    pub animations: Handle<TextureAtlasLayout>,
+    pub atlas_rows: HashMap<Action, ActionLocation>,
 }
 
-#[derive(Debug, Resource)]
-pub(crate) struct TurretConfigs(HashMap<String, TurretConfig>);
+#[derive(Debug, Resource, Deref)]
+pub(crate) struct TurretConfigs(HashMap<TurretKind, TurretConfig>);
 
 impl TurretConfigs {
     pub(crate) fn init(config_paths: &Vec<PathBuf>, asset_server: &AssetServer) -> Self {
@@ -25,7 +25,7 @@ impl TurretConfigs {
             .iter()
             .map(|p| {
                 let sck = TurretConfigKeys::from(p);
-                (sck.name.clone(), TurretConfig::build(sck, asset_server))
+                (sck.kind.clone(), TurretConfig::build(sck, asset_server))
             })
             .collect();
         TurretConfigs(hmap)
@@ -58,9 +58,15 @@ impl TurretConfig {
     }
 }
 
+#[derive(Debug, serde::Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum TurretKind {
+    Basic,
+}
+
 #[derive(Debug, Deserialize)]
+#[serde(rename = "TurretConfig")]
 struct TurretConfigKeys {
-    name: String,
+    kind: TurretKind,
     shot_time: f32,
     damage: f32,
     range: f32,
