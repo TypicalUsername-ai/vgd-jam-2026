@@ -1,10 +1,21 @@
 use std::ops::Deref;
 
-use crate::buildings::{ActiveHero, HeroConfig, HeroConfigs, HeroKind};
+use crate::{
+    buildings::{ActiveHero, HeroConfig, HeroConfigs, HeroKind},
+    ui_assets::UiAssets,
+};
 use bevy::{ecs::relationship::RelatedSpawnerCommands, prelude::*};
 use serde::Deserialize;
 
 use super::map_config::LevelMapConfig;
+
+#[derive(Debug, Component)]
+#[relationship(relationship_target = AvailableMenus)]
+pub struct MenuFor(Entity);
+
+#[derive(Debug, Component)]
+#[relationship_target(relationship = MenuFor)]
+pub struct AvailableMenus(Vec<Entity>);
 
 /// a single point which can hold a single [ActiveHero]
 #[derive(Debug, Component, Default)]
@@ -16,6 +27,7 @@ pub(crate) fn setup_hero_slots(
     mut commands: Commands,
     //level_config: Res<LevelMapConfig>,
     spawner_configs: Res<HeroConfigs>,
+    ui_assets: Res<UiAssets>,
 ) {
     commands
         .spawn((
@@ -29,16 +41,16 @@ pub(crate) fn setup_hero_slots(
                 grid_template_rows: vec![RepeatedGridTrack::percent(4, 24.)],
                 ..default()
             },
-            BackgroundColor(Color::srgb_u8(155, 0, 120)),
+            //ImageNode::new(texture),
         ))
         .with_children(|cs| {
             for i in 0..4 {
                 cs.spawn((
                     HeroSlot::default(),
-                    ImageNode::solid_color(Color::srgb_u8(0, 0, 155))
-                        .with_mode(NodeImageMode::Stretch),
+                    ImageNode::solid_color(Color::BLACK.with_alpha(0.)),
                 ))
-                .observe(build_spot_menu);
+                .observe(build_spot_menu)
+                .with_child(ImageNode::new(ui_assets.portrait_bg.clone()));
             }
         });
     /*
@@ -71,6 +83,7 @@ fn build_spot_menu(
     if let Some(ctx) = ctx_query.iter().next() {
         commands.entity(ctx).despawn_children().despawn();
     }
+    warn!("{:?}", event.entity);
     let (slot_entity, slot) = query
         .iter()
         .find(|&qi| qi.0 == event.entity)
@@ -82,14 +95,16 @@ fn build_spot_menu(
             min_width: px(200.),
             min_height: px(100.0),
             position_type: PositionType::Relative,
-            left: percent(102.),
+            left: percent(2.),
             display: Display::Flex,
+            row_gap: px(10.),
             flex_direction: FlexDirection::Column,
             align_content: AlignContent::SpaceBetween,
             align_items: AlignItems::Center,
             ..default()
         },
-        BackgroundColor(Color::srgb_u8(0, 0, 100)),
+        BackgroundColor(Color::srgb_u8(0, 20, 100)),
+        MenuFor(slot_entity),
         Pickable::IGNORE,
     );
     let mut e_cmds = commands.spawn(bundle);
@@ -100,7 +115,7 @@ fn build_spot_menu(
         let available_configs: Vec<&HeroConfig> = hero_configs
             .iter()
             .filter_map(|(k, v)| {
-                if level_config.available_heroes.contains(&k) {
+                if level_config.available_heroes.contains(k) {
                     Some(v)
                 } else {
                     None
@@ -124,7 +139,7 @@ fn build_buttons(parent_cmds: &mut RelatedSpawnerCommands<ChildOf>, choices: &[&
     if choices.is_empty() {
         parent_cmds.spawn(Text::new("No available towers / upgrades"));
     } else {
-        for entry in choices.into_iter() {
+        for entry in choices.iter() {
             parent_cmds
                 .spawn((
                     SelectChoice {
@@ -133,25 +148,17 @@ fn build_buttons(parent_cmds: &mut RelatedSpawnerCommands<ChildOf>, choices: &[&
                     },
                     Node {
                         display: Display::Flex,
-                        flex_direction: FlexDirection::Column,
+                        flex_direction: FlexDirection::Row,
                         align_items: AlignItems::Center,
-                        max_height: px(200.),
-                        width: percent(100.),
+                        height: percent(50.),
+                        aspect_ratio: Some(1.),
+                        //min_width: px(200.),
                         flex_grow: 1.,
                         ..default()
                     },
-                    children![
-                        ImageNode::from_atlas_image(
-                            entry.sprite.clone(),
-                            TextureAtlas {
-                                layout: entry.animations.clone(),
-                                index: 0,
-                            }
-                        )
-                        .with_mode(NodeImageMode::Auto),
-                        Text::new(format!("{:?}", entry.hero.spawner_kind)),
-                        BackgroundColor(Color::srgb_u8(200, 0, 0)),
-                    ],
+                    ImageNode::new(entry.sprite.clone()).with_mode(NodeImageMode::Stretch),
+                    BackgroundColor(Color::BLACK),
+                    children![Text::new(format!("{:?}", entry.hero.spawner_kind)),],
                 ))
                 .observe(replace_slot);
         }
@@ -161,12 +168,13 @@ fn build_buttons(parent_cmds: &mut RelatedSpawnerCommands<ChildOf>, choices: &[&
 fn replace_slot(
     event: On<Pointer<Click>>,
     mut commands: Commands,
-    mut slot_query: Query<(&mut HeroSlot, &mut ImageNode), With<Children>>,
+    mut slot_query: Query<(&mut HeroSlot, &mut ImageNode), With<AvailableMenus>>,
     options: Query<(Entity, &SelectChoice)>,
 ) {
     for (mut slot, mut portrait) in slot_query.iter_mut() {
         if let Some((_e, new_hero)) = options.iter().find(|(e, sc)| event.entity == *e) {
             portrait.image = new_hero.portrait.clone();
+            portrait.color = Color::WHITE.with_alpha(100.);
             slot.hero = Some(new_hero.hero.clone());
         }
         info!("click event {} >> {:?}", event.entity, slot.hero)

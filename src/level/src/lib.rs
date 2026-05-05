@@ -1,6 +1,7 @@
 use bevy::{asset::io::embedded::GetAssetServer, camera::visibility::RenderLayers, prelude::*};
 use state::GlobalState;
 use std::path::PathBuf;
+mod ui_assets;
 
 mod animation;
 mod buildings;
@@ -30,6 +31,7 @@ pub(crate) fn setup_camera(mut commands: Commands) {
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
+        app.insert_resource(ui_assets::UiAssets::init(app.get_asset_server()));
         app.insert_resource(buildings::HeroConfigs::init(
             &self.hero_configs,
             app.get_asset_server(),
