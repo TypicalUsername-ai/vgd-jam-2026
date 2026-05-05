@@ -1,4 +1,4 @@
-use crate::level_map::HeroSlot;
+use crate::{animation::AnimationState, level_map::HeroSlot};
 use bevy::prelude::*;
 
 use super::hero_config::HeroConfig;
@@ -42,15 +42,17 @@ impl ActiveHero {
                 config.sprite.clone(),
                 TextureAtlas {
                     layout: config.animations.clone(),
-                    index: config
-                        .atlas_rows
-                        .get(&Action::Idle)
-                        .unwrap_or_else(|| {
-                            panic!("Spawner {:?} has no idle action configured", config)
-                        })
-                        .row
-                        .to_owned(),
+                    index: 0,
                 },
+            ),
+            AnimationState::new(
+                0.25,
+                Action::Idle,
+                config
+                    .atlas_rows
+                    .get(&Action::Idle)
+                    .expect("Animations are configured")
+                    .clone(),
             ),
             Transform::from_translation(position),
             Pickable::default(),
@@ -61,4 +63,8 @@ impl ActiveHero {
 #[derive(Debug, Clone, Copy, serde::Deserialize, PartialEq, Eq, Hash)]
 pub(crate) enum HeroKind {
     Chicken,
+    Llama,
+    Pig,
+    Sheep,
+    Cow,
 }

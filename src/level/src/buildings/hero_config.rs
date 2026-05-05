@@ -52,7 +52,7 @@ impl HeroConfig {
                 .animations
                 .into_iter()
                 .enumerate()
-                .map(|(row, (action, len))| (action, ActionLocation::new(row, len)))
+                .map(|(idx, (action, len))| (action, (idx * rows)..(idx * rows + len)))
                 .collect(),
         }
     }

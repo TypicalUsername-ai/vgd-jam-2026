@@ -37,6 +37,7 @@ impl TurretConfig {
         let rows = value.animations.len();
         let cols = value.animations.iter().map(|a| a.1).max().unwrap_or(0);
         let building = Turret {
+            kind: value.kind,
             shot_timer: Timer::from_seconds(value.shot_time, TimerMode::Repeating),
             damage: value.damage,
             range: value.range,
@@ -52,7 +53,7 @@ impl TurretConfig {
                 .animations
                 .into_iter()
                 .enumerate()
-                .map(|(idx, (action, len))| (action, ActionLocation::new(idx, len)))
+                .map(|(idx, (action, len))| (action, (idx * rows)..(idx * rows + len)))
                 .collect(),
         }
     }

@@ -1,9 +1,10 @@
+use crate::buildings::{Turret, TurretConfigs};
 use bevy::prelude::*;
 
 #[derive(Debug, Component)]
 pub(crate) struct AnimationState {
     pub animation_timer: Timer,
-    current_frame: usize,
+    current_frame: std::iter::Cycle<ActionLocation>,
     color: Color,
     pub action: Action,
     // needs current atlas position etc
@@ -11,7 +12,23 @@ pub(crate) struct AnimationState {
 
 impl AnimationState {
     pub fn next_frame(&mut self, sprite: &mut Sprite) {
-        todo!();
+        sprite
+            .texture_atlas
+            .as_mut()
+            .expect("all animated sprites should have texture atlas!")
+            .index = self
+            .current_frame
+            .next()
+            .expect("Animation iterator is cyclical");
+    }
+
+    pub fn new(timer_secs: f32, action: Action, loc: ActionLocation) -> Self {
+        Self {
+            animation_timer: Timer::from_seconds(timer_secs, TimerMode::Repeating),
+            current_frame: loc.cycle(),
+            color: Color::WHITE,
+            action,
+        }
     }
 }
 
@@ -34,15 +51,4 @@ pub(crate) fn animate_all(mut query: Query<(&mut AnimationState, &mut Sprite)>, 
     }
 }
 
-#[derive(Debug)]
-pub struct ActionLocation {
-    pub row: usize,
-    pub len: usize,
-}
-
-impl ActionLocation {
-    #[must_use]
-    pub fn new(row: usize, len: usize) -> Self {
-        Self { row, len }
-    }
-}
+pub type ActionLocation = std::ops::Range<usize>;

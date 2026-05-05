@@ -16,6 +16,9 @@ impl Minion {}
 
 #[derive(Debug, serde::Deserialize, Hash, PartialEq, Eq, Clone, Copy)]
 pub(crate) enum MinionKind {
-    None,
     Chicken,
+    Llama,
+    Pig,
+    Sheep,
+    Cow,
 }

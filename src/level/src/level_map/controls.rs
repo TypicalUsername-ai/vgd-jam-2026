@@ -55,7 +55,7 @@ fn start_level(
             let avatar = minion_configs
                 .get(&hero.spawned_minion)
                 .unwrap_or_else(|| panic!("minion {:?} has no config", &hero.spawned_minion));
-            avatar.spawn(&mut commands, level_config.path_points[0])
+            avatar.spawn(&mut commands, level_config.path_points[0]);
         }
     }
     info!("event!! {:?}", event);

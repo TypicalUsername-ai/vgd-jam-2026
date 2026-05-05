@@ -6,4 +6,4 @@ mod turrets;
 pub(crate) use hero_config::{HeroConfig, HeroConfigs};
 pub(crate) use heroes::{ActiveHero, HeroKind, spawn_minions};
 pub(crate) use turret_config::{TurretConfig, TurretConfigs, TurretKind};
-pub(crate) use turrets::fire_turrets;
+pub(crate) use turrets::{Turret, fire_turrets};

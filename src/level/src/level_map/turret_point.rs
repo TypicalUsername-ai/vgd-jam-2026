@@ -1,8 +1,12 @@
+use crate::animation::Action;
 use bevy::prelude::*;
 use serde::Deserialize;
 
 use super::LevelMapConfig;
-use crate::buildings::{TurretConfigs, TurretKind};
+use crate::{
+    animation::AnimationState,
+    buildings::{TurretConfigs, TurretKind},
+};
 
 /// a single point which can holds a specified turret
 #[derive(Debug, Deserialize)]
@@ -33,7 +37,14 @@ pub(crate) fn setup_turrets(
                     index: 0,
                 },
             ),
-            BackgroundColor(Color::BLACK),
+            AnimationState::new(
+                0.25,
+                Action::Idle,
+                conf.atlas_rows
+                    .get(&Action::Idle)
+                    .expect("action is configured")
+                    .clone(),
+            ),
         ));
     }
 }

@@ -1,5 +1,5 @@
 use super::minion::MinionKind;
-use crate::animation::{Action, ActionLocation};
+use crate::animation::{Action, ActionLocation, AnimationState};
 use crate::minions::Minion;
 use bevy::prelude::*;
 use std::collections::HashMap;
@@ -27,6 +27,14 @@ impl MinionConfig {
             ),
             self.minion.clone(),
             Transform::from_translation(spawn_location),
+            AnimationState::new(
+                0.25,
+                Action::WalkLeft,
+                self.atlas_rows
+                    .get(&Action::WalkLeft)
+                    .expect("All actions are configured")
+                    .clone(),
+            ),
         ));
     }
 
@@ -49,7 +57,7 @@ impl MinionConfig {
                 .animations
                 .into_iter()
                 .enumerate()
-                .map(|(idx, (action, len))| (action, ActionLocation::new(idx, len)))
+                .map(|(idx, (action, len))| (action, (idx * rows)..(idx * rows + len)))
                 .collect(),
         }
     }
