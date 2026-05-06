@@ -2,21 +2,32 @@
 Video Game Design - Project
 
 ## General information
+
 Team members: Mateusz Domalewski
+
 Title: Animal Rush (work in progress)
+
 Genre: Tower offense
+
 Platform: linux (windows / web hopefully next)
 
 ## Theme and setting of the game
 Shortly (maximum 2-3 sentences per section), describe the goal of the game, theme,
 locations (worlds, levels, style), lore (backstory, main plots), and characters.
+
 ### Goal
 
+Finish all of the levels within one save to win the game. Upgrade and select character on each level to fit the challenges.
+
 ### Theme and Locations
+
+Theme is animals breaking out of holding. Locations will be various holding location such as shelter, zoo etc.
 
 ### Lore
 
 ### Characters
+
+current animal heroes available include chicken, llama, cow, sheep and pig. Each character has unique stats like speed and health which will enable combinations to beat different levels. 
 
 ## Tasks scheduled for this stage during the previous stage
 
@@ -57,3 +68,7 @@ level gameplay:
 
 | Id | Task description | Who |
 | -- | ---------------- | --- |
+| 5 | Fix ui/hud save functionality | MD |
+| 6 | finish level transitions | MD |
+| 7 | finish load/save functionality | MD |
+| 8 | fix applying upgrades | MD |
