@@ -41,6 +41,7 @@ impl TurretConfig {
             shot_timer: Timer::from_seconds(value.shot_time, TimerMode::Repeating),
             damage: value.damage,
             range: value.range,
+            firing_on: None,
             shoot_function: |_, _| todo!(),
         };
         let atlas_layout =

@@ -18,22 +18,33 @@ pub(crate) fn fire_turrets(
         turret.shot_timer.tick(time.delta());
         // check if turret timer finished
         if turret.shot_timer.just_finished() {
-            //  calculate furthest target for current turret
-            if let Some((entity, mut minion, _transform)) = minions_query
-                .iter_mut()
-                .sort_by::<MinionQuery>(|i1, i2| {
-                    i1.1.distance_traveled.total_cmp(&i2.1.distance_traveled)
-                })
-                .find(|emt| emt.2.translation.xy().distance(turret_pos) <= turret.range)
-            {
+            if let Some(target) = turret.firing_on {
                 //turret.shot_timer.reset();
+                let (entity, mut minion, minion_transform) = minions_query
+                    .get_mut(target)
+                    .expect("The minion fired on exists");
                 minion.health -= turret.damage;
                 info!("{:?} shot at {:?} ({})", turret, minion.kind, minion.health);
                 if minion.health <= f32::EPSILON {
                     info!("Minion {}, has died", entity);
                     commands.entity(entity).despawn();
+                    turret.firing_on = None;
                 }
                 //(turret.shoot_function)(&mut commands, *entity);
+            } else {
+                //  calculate furthest target for current turret as new firing target
+                turret.firing_on = minions_query
+                    .iter_mut()
+                    .sort_by::<MinionQuery>(|i1, i2| {
+                        i1.1.distance_traveled.total_cmp(&i2.1.distance_traveled)
+                    })
+                    .find_map(|emt| {
+                        if emt.2.translation.xy().distance(turret_pos) <= turret.range {
+                            Some(emt.0)
+                        } else {
+                            None
+                        }
+                    })
             }
         }
     }
@@ -45,5 +56,6 @@ pub(crate) struct Turret {
     pub shot_timer: Timer,
     pub damage: f32,
     pub range: f32,
+    pub firing_on: Option<Entity>,
     pub shoot_function: fn(cmds: &mut Commands, target: Entity),
 }
