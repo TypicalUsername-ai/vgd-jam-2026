@@ -20,12 +20,12 @@ pub(crate) struct TurretConfig {
 pub(crate) struct TurretConfigs(HashMap<TurretKind, TurretConfig>);
 
 impl TurretConfigs {
-    pub(crate) fn init(config_paths: &Vec<PathBuf>, asset_server: &AssetServer) -> Self {
+    pub(crate) fn init(config_paths: &[PathBuf], asset_server: &AssetServer) -> Self {
         let hmap = config_paths
             .iter()
             .map(|p| {
                 let sck = TurretConfigKeys::from(p);
-                (sck.kind.clone(), TurretConfig::build(sck, asset_server))
+                (sck.kind, TurretConfig::build(sck, asset_server))
             })
             .collect();
         TurretConfigs(hmap)

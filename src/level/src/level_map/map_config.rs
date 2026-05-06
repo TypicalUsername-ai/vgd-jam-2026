@@ -25,32 +25,6 @@ pub(crate) struct LevelMapConfig {
     pub bg_image: Option<PathBuf>,
 }
 
-impl LevelMapConfig {
-    pub fn compute_next(&self, speed: f32, distance_covered: f32) -> Vec3 {
-        // all distance we need to compute
-        let mut remaining = distance_covered + speed;
-        let mut current_point = 1;
-        while remaining >= f32::EPSILON && current_point < self.path_points.len() {
-            let seg_start = self.path_points[current_point - 1];
-            let seg_end = self.path_points[current_point];
-            let distance = seg_start.distance(seg_end);
-            match remaining
-                .partial_cmp(&distance)
-                .expect("No value should be a NaN")
-            {
-                std::cmp::Ordering::Less => return seg_start.move_towards(seg_end, remaining),
-                std::cmp::Ordering::Equal => return seg_end,
-                std::cmp::Ordering::Greater => {
-                    info!("skipping one segment!");
-                    current_point += 1;
-                    remaining -= distance;
-                }
-            }
-        }
-        panic!("Movement logic failed");
-    }
-}
-
 /// Load configs from .ron files
 impl From<&Path> for LevelMapConfig {
     fn from(value: &Path) -> Self {

@@ -1,10 +1,9 @@
+use super::map_config::LevelMapConfig;
 use crate::{
-    buildings::{ActiveHero, HeroConfig, HeroConfigs, HeroKind},
+    buildings::{ActiveHero, HeroConfig, HeroConfigs},
     ui_assets::UiAssets,
 };
 use bevy::{ecs::relationship::RelatedSpawnerCommands, prelude::*};
-
-use super::map_config::LevelMapConfig;
 
 #[derive(Debug, Component)]
 #[relationship(relationship_target = AvailableMenus)]
@@ -31,12 +30,7 @@ impl HeroSlot {
     }
 }
 
-pub(crate) fn setup_hero_slots(
-    mut commands: Commands,
-    //level_config: Res<LevelMapConfig>,
-    spawner_configs: Res<HeroConfigs>,
-    ui_assets: Res<UiAssets>,
-) {
+pub(crate) fn setup_hero_slots(mut commands: Commands, ui_assets: Res<UiAssets>) {
     commands
         .spawn((
             Node {
@@ -52,7 +46,7 @@ pub(crate) fn setup_hero_slots(
             //ImageNode::new(texture),
         ))
         .with_children(|cs| {
-            for i in 0..4 {
+            for _i in 0..4 {
                 let bar_id = cs
                     .spawn((
                         ImageNode::from_atlas_image(
@@ -68,18 +62,6 @@ pub(crate) fn setup_hero_slots(
                 build_portrait(cs, &ui_assets.portrait_bg, bar_id);
             }
         });
-    /*
-    for spawn_point in level_config.spawner_points.iter() {
-        commands
-            .spawn(SpawnerBuilding::init(
-                spawn_point.position,
-                spawner_configs
-                    .get(&SpawnerKind::None)
-                    .expect("Default config has to exist"),
-            ))
-            .observe(build_spot_menu);
-    }
-    */
 }
 
 fn build_portrait(
@@ -150,7 +132,7 @@ fn build_spot_menu(
     let mut e_cmds = commands.spawn(bundle);
     e_cmds.set_parent_in_place(slot_entity);
     if let Some(hero) = &slot.hero {
-        //panic!()
+        panic!("implement upgrades for {:?}", hero)
     } else {
         let available_configs: Vec<&HeroConfig> = hero_configs
             .iter()
@@ -164,9 +146,6 @@ fn build_spot_menu(
             .collect();
         e_cmds.with_children(|parent_cmds| build_buttons(parent_cmds, &available_configs));
     }
-
-    warn!("spawned bundle");
-    //spawn_building_menu(children.get(0), &mut commands)
 }
 
 #[derive(Debug, Component)]
@@ -207,7 +186,6 @@ fn build_buttons(parent_cmds: &mut RelatedSpawnerCommands<ChildOf>, choices: &[&
 
 fn replace_slot(
     event: On<Pointer<Click>>,
-    mut commands: Commands,
     mut slot_query: Query<(&mut HeroSlot, &mut ImageNode), With<AvailableMenus>>,
     options: Query<(Entity, &SelectChoice)>,
 ) {

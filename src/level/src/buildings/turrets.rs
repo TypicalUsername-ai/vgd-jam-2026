@@ -1,4 +1,3 @@
-use crate::AnimationState;
 use crate::buildings::TurretKind;
 use crate::level_map::TracksHpFor;
 use crate::minions::Minion;
@@ -22,15 +21,15 @@ pub(crate) fn fire_turrets(
         if turret.shot_timer.just_finished() {
             if let Some(target) = turret.firing_on {
                 //turret.shot_timer.reset();
-                let (entity, mut minion, minion_transform) = minions_query
+                let (entity, mut minion, _minion_transform) = minions_query
                     .get_mut(target)
                     .expect("The minion fired on exists");
                 info!("{:?}", tracker_query);
-                let (tracked, mut tracker_sprite) = tracker_query
+                let (_tracked, mut tracker_sprite) = tracker_query
                     .iter_mut()
                     .find(|(t, _s)| t.collection().contains(&target))
                     .expect("every entity health should be tracked");
-                let mut atlas = tracker_sprite
+                let atlas = tracker_sprite
                     .texture_atlas
                     .as_mut()
                     .expect("hp bar should have atlas");

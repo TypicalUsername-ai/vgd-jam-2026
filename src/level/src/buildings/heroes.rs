@@ -1,35 +1,8 @@
-use crate::{animation::AnimationState, level_map::HeroSlot};
+use crate::animation::AnimationState;
 use bevy::prelude::*;
 
 use super::hero_config::HeroConfig;
-use crate::{
-    animation::Action,
-    level_map::LevelMapConfig,
-    minions::{MinionConfigs, MinionKind},
-};
-
-/// uses building timers to spawn minions throughout the level
-pub(crate) fn spawn_minions(
-    mut commands: Commands,
-    time: Res<Time>,
-    level_config: Res<LevelMapConfig>,
-    minion_configs: Res<MinionConfigs>,
-    mut query: Query<(&HeroSlot)>,
-) {
-    for slot in query.iter() {
-        if let Some(hero) = &slot.hero {
-            // progress time for each spawner
-            minion_configs
-                .get(&hero.spawned_minion)
-                .unwrap_or_else(|| panic!("minion {:?} is not configured", hero.spawned_minion))
-                .spawn(
-                    &mut commands,
-                    slot.tracker_id,
-                    level_config.path_points[0].clone(),
-                );
-        }
-    }
-}
+use crate::{animation::Action, minions::MinionKind};
 
 #[derive(Debug, Component, Clone)]
 pub(crate) struct ActiveHero {

@@ -5,11 +5,7 @@ use crate::{
     minions::MinionConfigs,
 };
 
-pub(crate) fn setup_controls(
-    mut commands: Commands,
-    //level_config: Res<LevelMapConfig>,
-    //spawner_configs: Res<HeroConfigs>,
-) {
+pub(crate) fn setup_controls(mut commands: Commands) {
     commands
         .spawn((
             Node {
@@ -28,19 +24,6 @@ pub(crate) fn setup_controls(
             children![Text::new("Start level")],
         ))
         .observe(start_level);
-
-    /*
-    for spawn_point in level_config.spawner_points.iter() {
-        commands
-            .spawn(SpawnerBuilding::init(
-                spawn_point.position,
-                spawner_configs
-                    .get(&SpawnerKind::None)
-                    .expect("Default config has to exist"),
-            ))
-            .observe(build_spot_menu);
-    }
-    */
 }
 
 fn start_level(

@@ -42,7 +42,7 @@ pub(crate) fn setup_turrets(
                 Action::Idle,
                 conf.atlas_rows
                     .get(&Action::Idle)
-                    .expect("action is configured")
+                    .expect("action should be configured")
                     .clone(),
             ),
         ));

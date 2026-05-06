@@ -21,7 +21,7 @@ pub(crate) struct HeroConfig {
 pub(crate) struct HeroConfigs(HashMap<HeroKind, HeroConfig>);
 
 impl HeroConfigs {
-    pub(crate) fn init(config_paths: &Vec<PathBuf>, asset_server: &AssetServer) -> Self {
+    pub(crate) fn init(config_paths: &[PathBuf], asset_server: &AssetServer) -> Self {
         let hmap = config_paths
             .iter()
             .map(|p| {

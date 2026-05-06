@@ -70,7 +70,7 @@ impl MinionConfig {
 pub(crate) struct MinionConfigs(HashMap<MinionKind, MinionConfig>);
 
 impl MinionConfigs {
-    pub(crate) fn init(config_paths: &Vec<PathBuf>, asset_server: &AssetServer) -> Self {
+    pub(crate) fn init(config_paths: &[PathBuf], asset_server: &AssetServer) -> Self {
         let hmap = config_paths
             .iter()
             .map(|p| {

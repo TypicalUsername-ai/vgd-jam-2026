@@ -16,19 +16,6 @@ pub struct LevelPlugin {
     minion_configs: Vec<PathBuf>,
 }
 
-#[derive(Debug, Component)]
-pub struct LevelCamera {}
-
-const DEFAULT_LAYERS: [usize; 6] = [0, 1, 2, 3, 4, 5];
-
-pub(crate) fn setup_camera(mut commands: Commands) {
-    commands.spawn((
-        Camera2d,
-        RenderLayers::from_layers(&DEFAULT_LAYERS),
-        LevelCamera {},
-    ));
-}
-
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(ui_assets::UiAssets::init(app.get_asset_server()));
@@ -60,8 +47,6 @@ impl Plugin for LevelPlugin {
             Update,
             (
                 buildings::fire_turrets,
-                //buildings::spawn_minions,
-                //minions::handle_damage, // or move handle damage to turret firing action
                 minions::move_minions,
                 animation::animate_all,
             )
