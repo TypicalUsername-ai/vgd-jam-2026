@@ -1,42 +1,90 @@
-use crate::level_map::LevelMapConfig;
-use bevy::color::palettes::basic;
-use bevy::{camera::visibility::RenderLayers, prelude::*};
+use bevy::{asset::io::embedded::GetAssetServer, prelude::*};
 use state::GlobalState;
+use std::path::PathBuf;
+mod ui_assets;
 
-mod characters;
+mod animation;
+mod heroes;
 mod level_map;
-mod tiles;
+mod minions;
+mod turrets;
+use animation::{Action, AnimationState};
+use level_map::LevelMapConfig;
 
-pub struct CharacterSelectPlugin {}
-
-#[derive(Debug, Component)]
-pub struct LevelCamera {}
-
-const DEFAULT_LAYERS: [usize; 6] = [0, 1, 2, 3, 4, 5];
-
-pub(crate) fn setup_camera(mut commands: Commands) {
-    commands.spawn((
-        Camera2d,
-        RenderLayers::from_layers(&DEFAULT_LAYERS),
-        LevelCamera {},
-    ));
+pub struct LevelPlugin {
+    hero_configs: Vec<PathBuf>,
+    turret_configs: Vec<PathBuf>,
+    minion_configs: Vec<PathBuf>,
 }
 
-impl Plugin for CharacterSelectPlugin {
+impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(level_map::MapPlugin {
-            maps_directory: "../assets".into(),
-        });
+        app.insert_resource(ui_assets::UiAssets::init(app.get_asset_server()));
+        app.insert_resource(heroes::HeroConfigs::init(
+            &self.hero_configs,
+            app.get_asset_server(),
+        ));
+        app.insert_resource(turrets::TurretConfigs::init(
+            &self.turret_configs,
+            app.get_asset_server(),
+        ));
+        app.insert_resource(minions::MinionConfigs::init(
+            &self.minion_configs,
+            app.get_asset_server(),
+        ));
         app.add_systems(
             OnEnter(GlobalState::ActiveLevel),
             (
-                //setup_camera.before(characters::chicken::spawn_chicken), //character_select::ui::draw_character_select.before(characters::chicken::spawn_chicken),
-                characters::chicken::spawn_chicken,
-            ),
+                level_map::load_level,
+                level_map::setup_background,
+                level_map::setup_path,
+                level_map::setup_turrets,
+                level_map::setup_hero_slots,
+                level_map::setup_controls,
+            )
+                .chain(),
         );
-        app.add_systems(Update, (characters::chicken::animate_chicken).chain());
-        //app.add_systems(OnExit(GlobalState::ActiveLevel), ());
+        app.add_systems(
+            Update,
+            (
+                turrets::fire_turrets,
+                minions::move_minions,
+                animation::animate_all,
+            )
+                .chain()
+                .run_if(in_state(GlobalState::ActiveLevel).and(resource_exists::<LevelMapConfig>)),
+        );
     }
 }
 
-pub struct LevelPlugin {}
+impl LevelPlugin {
+    #[must_use]
+    pub fn new(
+        hero_configs_path: PathBuf,
+        turret_configs_path: PathBuf,
+        minion_configs_path: PathBuf,
+    ) -> Self {
+        Self {
+            hero_configs: read_configs_dir(hero_configs_path),
+            turret_configs: read_configs_dir(turret_configs_path),
+            minion_configs: read_configs_dir(minion_configs_path),
+        }
+    }
+}
+
+fn read_configs_dir(dir: PathBuf) -> Vec<PathBuf> {
+    dir.read_dir()
+        .expect("configs path is a directory")
+        .filter_map(|e| {
+            // dont need to check for exists as we enumerate a directory
+            if let Ok(f) = e
+                && f.path().extension().is_some_and(|e| e == "ron")
+            {
+                Some(f.path())
+            } else {
+                // Dir entry is invalid
+                None
+            }
+        })
+        .collect()
+}

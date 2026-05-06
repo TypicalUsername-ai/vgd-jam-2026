@@ -1,0 +1,86 @@
+use super::heroes::{ActiveHero, HeroKind};
+use crate::Action;
+use crate::animation::ActionLocation;
+use crate::minions::MinionKind;
+use bevy::prelude::*;
+use serde::Deserialize;
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::Read;
+use std::path::PathBuf;
+
+#[derive(Debug)]
+pub(crate) struct HeroConfig {
+    pub hero: ActiveHero,
+    pub sprite: Handle<Image>,
+    pub animations: Handle<TextureAtlasLayout>,
+    pub atlas_rows: HashMap<Action, ActionLocation>,
+}
+
+#[derive(Debug, Resource, Deref)]
+pub(crate) struct HeroConfigs(HashMap<HeroKind, HeroConfig>);
+
+impl HeroConfigs {
+    pub(crate) fn init(config_paths: &[PathBuf], asset_server: &AssetServer) -> Self {
+        let hmap = config_paths
+            .iter()
+            .map(|p| {
+                let sck = HeroConfigKeys::from(p);
+                (sck.kind, HeroConfig::build(sck, asset_server))
+            })
+            .collect();
+        HeroConfigs(hmap)
+    }
+}
+
+impl HeroConfig {
+    fn build(value: HeroConfigKeys, asset_server: &AssetServer) -> Self {
+        let rows = value.animations.len();
+        let cols = value.animations.iter().map(|a| a.1).max().unwrap_or(0);
+        let hero = ActiveHero {
+            spawner_kind: value.kind,
+            spawn_timer: Timer::from_seconds(value.spawn_time, TimerMode::Repeating),
+            spawned_minion: value.spawned_minion,
+        };
+        let atlas_layout =
+            TextureAtlasLayout::from_grid(value.tile_size, cols as u32, rows as u32, None, None);
+        Self {
+            hero,
+            sprite: asset_server.load(value.sprite_path),
+            animations: asset_server.add(atlas_layout),
+            atlas_rows: value
+                .animations
+                .into_iter()
+                .enumerate()
+                .map(|(idx, (action, len))| (action, (idx * rows)..(idx * rows + len)))
+                .collect(),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename = "HeroConfig")]
+struct HeroConfigKeys {
+    kind: HeroKind,
+    spawn_time: f32,
+    animations: Vec<(Action, usize)>,
+    sprite_path: PathBuf,
+    tile_size: UVec2,
+    spawned_minion: MinionKind,
+}
+
+impl From<&PathBuf> for HeroConfigKeys {
+    fn from(value: &PathBuf) -> Self {
+        let config = File::open(value);
+        match config {
+            Ok(mut config_file) => {
+                let mut buf = String::new();
+                let _ = config_file.read_to_string(&mut buf);
+                ron::from_str(&buf).expect("error parsing options file!! {value}")
+            }
+            Err(_err) => {
+                panic!("error reading file!! {}", value.display())
+            }
+        }
+    }
+}

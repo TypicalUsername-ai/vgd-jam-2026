@@ -1,7 +1,9 @@
+use std::path::PathBuf;
+
 use bevy::prelude::*;
 #[cfg(feature = "inspector")]
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
-use level::CharacterSelectPlugin;
+use level::LevelPlugin;
 use level_selector::LevelSelectPlugin;
 use main_menu::MainMenuPlugin;
 use state::GameStatePlugin;
@@ -9,7 +11,7 @@ use state::GameStatePlugin;
 mod window;
 
 fn main() {
-    let config = std::path::Path::new("../assets/level-config.ron");
+    let config = std::path::Path::new("../assets/run_1.ron");
 
     let mut app = App::new();
 
@@ -24,7 +26,11 @@ fn main() {
     .add_plugins(GameStatePlugin {})
     .add_plugins(MainMenuPlugin {})
     .add_plugins(LevelSelectPlugin::from(config))
-    .add_plugins(CharacterSelectPlugin {});
+    .add_plugins(LevelPlugin::new(
+        PathBuf::from("../assets/heroes"),
+        PathBuf::from("../assets/turrets"),
+        PathBuf::from("../assets/minions"),
+    ));
 
     #[cfg(feature = "inspector")]
     app.add_plugins(EguiPlugin::default())

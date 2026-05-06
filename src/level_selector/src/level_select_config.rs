@@ -1,6 +1,5 @@
-use crate::LevelConfiguration;
+use crate::{LevelConfiguration, level_config::SaveGameState};
 use bevy::prelude::*;
-use ron;
 use serde::Deserialize;
 use std::{
     fs::File,
@@ -9,19 +8,21 @@ use std::{
 };
 
 #[derive(Deserialize, Resource, Clone)]
-pub struct LevelSelectConfig {
+pub struct SaveSelectConfig {
     pub(crate) map_config_folder: PathBuf,
-    pub(crate) levels: Vec<LevelConfiguration>,
+    pub(crate) saves: Vec<SaveGameState>, // TODO move to mage saves
 }
 
-impl From<&Path> for LevelSelectConfig {
+impl From<&Path> for SaveSelectConfig {
     fn from(value: &Path) -> Self {
         let config = File::open(value);
         match config {
             Ok(mut config_file) => {
                 let mut buf = String::new();
                 let _ = config_file.read_to_string(&mut buf);
-                ron::from_str(&buf).expect("error parsing options file!! {value}")
+                ron::from_str(&buf).unwrap_or_else(|e| {
+                    panic!("error parsing options file {:?} with error {}", value, e)
+                })
             }
             Err(_err) => {
                 panic!("error reading file!! {}", value.display())
