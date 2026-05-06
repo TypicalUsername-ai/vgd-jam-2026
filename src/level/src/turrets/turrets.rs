@@ -1,4 +1,4 @@
-use crate::buildings::TurretKind;
+use super::TurretKind;
 use crate::level_map::TracksHpFor;
 use crate::minions::Minion;
 use bevy::prelude::*;

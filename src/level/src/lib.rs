@@ -1,12 +1,13 @@
-use bevy::{asset::io::embedded::GetAssetServer, camera::visibility::RenderLayers, prelude::*};
+use bevy::{asset::io::embedded::GetAssetServer, prelude::*};
 use state::GlobalState;
 use std::path::PathBuf;
 mod ui_assets;
 
 mod animation;
-mod buildings;
+mod heroes;
 mod level_map;
 mod minions;
+mod turrets;
 use animation::{Action, AnimationState};
 use level_map::LevelMapConfig;
 
@@ -19,11 +20,11 @@ pub struct LevelPlugin {
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(ui_assets::UiAssets::init(app.get_asset_server()));
-        app.insert_resource(buildings::HeroConfigs::init(
+        app.insert_resource(heroes::HeroConfigs::init(
             &self.hero_configs,
             app.get_asset_server(),
         ));
-        app.insert_resource(buildings::TurretConfigs::init(
+        app.insert_resource(turrets::TurretConfigs::init(
             &self.turret_configs,
             app.get_asset_server(),
         ));
@@ -46,7 +47,7 @@ impl Plugin for LevelPlugin {
         app.add_systems(
             Update,
             (
-                buildings::fire_turrets,
+                turrets::fire_turrets,
                 minions::move_minions,
                 animation::animate_all,
             )

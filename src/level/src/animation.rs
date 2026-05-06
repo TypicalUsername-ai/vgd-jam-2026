@@ -1,4 +1,4 @@
-use crate::buildings::{Turret, TurretConfigs};
+use crate::turrets::{Turret, TurretConfigs};
 use bevy::prelude::*;
 
 #[derive(Debug, Component)]

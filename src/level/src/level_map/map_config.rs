@@ -1,4 +1,4 @@
-use crate::buildings::HeroKind;
+use crate::heroes::HeroKind;
 
 use super::TurretPoint;
 use bevy::prelude::*;
@@ -19,6 +19,8 @@ pub(crate) struct LevelMapConfig {
     pub tower_points: Vec<TurretPoint>,
     /// all [HeroKind] available for a given level
     pub available_heroes: Vec<HeroKind>,
+    /// upgrade points available to spend
+    pub upgrade_points: u8,
     /// background color for level
     pub bg_color: Color,
     /// background sprite for level backdrop

@@ -1,6 +1,6 @@
 use super::map_config::LevelMapConfig;
 use crate::{
-    buildings::{ActiveHero, HeroConfig, HeroConfigs},
+    heroes::{ActiveHero, HeroConfig, HeroConfigs},
     ui_assets::UiAssets,
 };
 use bevy::{ecs::relationship::RelatedSpawnerCommands, prelude::*};

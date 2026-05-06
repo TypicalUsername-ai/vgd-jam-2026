@@ -5,7 +5,7 @@ use serde::Deserialize;
 use super::LevelMapConfig;
 use crate::{
     animation::AnimationState,
-    buildings::{TurretConfigs, TurretKind},
+    turrets::{TurretConfigs, TurretKind},
 };
 
 /// a single point which can holds a specified turret
