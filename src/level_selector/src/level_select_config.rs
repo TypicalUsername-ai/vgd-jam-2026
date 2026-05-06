@@ -1,4 +1,4 @@
-use crate::LevelConfiguration;
+use crate::{LevelConfiguration, level_config::SaveGameState};
 use bevy::prelude::*;
 use serde::Deserialize;
 use std::{
@@ -8,12 +8,12 @@ use std::{
 };
 
 #[derive(Deserialize, Resource, Clone)]
-pub struct LevelSelectConfig {
+pub struct SaveSelectConfig {
     pub(crate) map_config_folder: PathBuf,
-    pub(crate) levels: Vec<LevelConfiguration>,
+    pub(crate) saves: Vec<SaveGameState>, // TODO move to mage saves
 }
 
-impl From<&Path> for LevelSelectConfig {
+impl From<&Path> for SaveSelectConfig {
     fn from(value: &Path) -> Self {
         let config = File::open(value);
         match config {

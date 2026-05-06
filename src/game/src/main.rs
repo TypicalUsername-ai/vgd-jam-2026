@@ -11,7 +11,7 @@ use state::GameStatePlugin;
 mod window;
 
 fn main() {
-    let config = std::path::Path::new("../assets/level-config.ron");
+    let config = std::path::Path::new("../assets/run_1.ron");
 
     let mut app = App::new();
 

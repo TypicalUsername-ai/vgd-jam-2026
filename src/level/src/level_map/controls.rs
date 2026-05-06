@@ -24,6 +24,16 @@ pub(crate) fn setup_controls(mut commands: Commands) {
             children![Text::new("Start level")],
         ))
         .observe(start_level);
+
+    commands.spawn((
+        Node {
+            right: percent(5.),
+            top: px(0.),
+            ..default()
+        },
+        BackgroundColor(Color::srgb_u8(120, 120, 0)),
+        children![Text::new("Pause / Settings")],
+    ));
 }
 
 fn start_level(

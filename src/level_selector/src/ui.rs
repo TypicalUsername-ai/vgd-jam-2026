@@ -2,20 +2,20 @@ use bevy::prelude::*;
 use state::{GlobalState, LevelState};
 use tracing::warn;
 
-use crate::LevelSelectConfig;
+use crate::{SaveSelectConfig, level_config::SaveGameState};
 
 #[derive(Debug, Component)]
 pub(crate) struct LevelSelectMenu {}
 
 #[derive(Debug, Component)]
 #[require(Button)]
-pub(crate) struct LevelSelectButton {
-    pub(crate) level_id: String,
+pub(crate) struct SaveSelectButton {
+    pub(crate) save: SaveGameState,
 }
 
 pub(crate) fn react_buttons(
-    query: Query<(&LevelSelectButton, &Interaction), Changed<Interaction>>,
-    lvl_config: Res<LevelSelectConfig>,
+    query: Query<(&SaveSelectButton, &Interaction), Changed<Interaction>>,
+    lvl_config: Res<SaveSelectConfig>,
     mut next_global: ResMut<NextState<GlobalState>>,
     mut next_level: ResMut<NextState<LevelState>>,
 ) {
@@ -24,7 +24,7 @@ pub(crate) fn react_buttons(
             Interaction::Pressed => {
                 warn!("Pressed a button {:?}", button);
                 next_level.set(LevelState::load(
-                    button.level_id.clone(),
+                    button.save.current_level_id.clone(),
                     lvl_config.map_config_folder.clone(),
                 ));
                 next_global.set(GlobalState::ActiveLevel);
@@ -35,7 +35,7 @@ pub(crate) fn react_buttons(
     }
 }
 
-pub(crate) fn draw_level_select(mut commands: Commands, levels_config: Res<LevelSelectConfig>) {
+pub(crate) fn draw_level_select(mut commands: Commands, saves_config: Res<SaveSelectConfig>) {
     info!("spawning main menu text");
     commands
         .spawn((
@@ -66,11 +66,15 @@ pub(crate) fn draw_level_select(mut commands: Commands, levels_config: Res<Level
                     // BackgroundColor(tailwind::BLUE_300.into()),
                 )
                 .with_children(|level_pane| {
-                    for configuration in levels_config.levels.iter() {
+                    for configuration in saves_config.saves.iter() {
                         level_pane.spawn(make_button(
-                            configuration.name.clone(),
-                            LevelSelectButton {
-                                level_id: configuration.id.clone(),
+                            format!(
+                                "save {} (level: {})",
+                                configuration.save_name.clone(),
+                                configuration.current_level_id.clone()
+                            ),
+                            SaveSelectButton {
+                                save: configuration.clone(),
                             },
                         ));
                     }

@@ -21,6 +21,8 @@ pub(crate) struct LevelMapConfig {
     pub available_heroes: Vec<HeroKind>,
     /// upgrade points available to spend
     pub upgrade_points: u8,
+    /// next level to load
+    pub next_level_id: Option<String>, // TODO
     /// background color for level
     pub bg_color: Color,
     /// background sprite for level backdrop

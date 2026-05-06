@@ -6,12 +6,12 @@ mod level_select_config;
 mod ui;
 
 pub use level_config::LevelConfiguration;
-pub use level_select_config::LevelSelectConfig;
+pub use level_select_config::SaveSelectConfig;
 
 use crate::ui::react_buttons;
 
 pub struct LevelSelectPlugin {
-    config: LevelSelectConfig,
+    config: SaveSelectConfig,
 }
 
 impl Plugin for LevelSelectPlugin {
@@ -29,7 +29,7 @@ impl Plugin for LevelSelectPlugin {
 impl From<&Path> for LevelSelectPlugin {
     fn from(value: &Path) -> Self {
         Self {
-            config: LevelSelectConfig::from(value),
+            config: SaveSelectConfig::from(value),
         }
     }
 }

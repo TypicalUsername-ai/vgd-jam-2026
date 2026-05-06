@@ -1,6 +1,6 @@
 use super::map_config::LevelMapConfig;
 use crate::{
-    heroes::{ActiveHero, HeroConfig, HeroConfigs},
+    heroes::{ActiveHero, HeroConfig, HeroConfigs, Upgrade, UpgradeKind},
     ui_assets::UiAssets,
 };
 use bevy::{ecs::relationship::RelatedSpawnerCommands, prelude::*};
@@ -18,6 +18,7 @@ pub struct AvailableMenus(Vec<Entity>);
 pub(crate) struct HeroSlot {
     pub hero: Option<ActiveHero>,
     pub tracker_id: Entity,
+    pub available_upgrades: Vec<Upgrade>,
 }
 
 impl HeroSlot {
@@ -26,6 +27,12 @@ impl HeroSlot {
         Self {
             tracker_id: hp_tracker,
             hero: None,
+            available_upgrades: vec![
+                Upgrade::new(UpgradeKind::Speed, 1),
+                Upgrade::new(UpgradeKind::Health, 1),
+                Upgrade::new(UpgradeKind::Speed, 1),
+                Upgrade::new(UpgradeKind::Health, 1),
+            ],
         }
     }
 }
@@ -132,7 +139,7 @@ fn build_spot_menu(
     let mut e_cmds = commands.spawn(bundle);
     e_cmds.set_parent_in_place(slot_entity);
     if let Some(hero) = &slot.hero {
-        panic!("implement upgrades for {:?}", hero)
+        e_cmds.with_children(|parent_cmds| build_upgrades(parent_cmds, &slot.available_upgrades));
     } else {
         let available_configs: Vec<&HeroConfig> = hero_configs
             .iter()
@@ -196,5 +203,50 @@ fn replace_slot(
             slot.hero = Some(new_hero.hero.clone());
         }
         info!("click event {} >> {:?}", event.entity, slot.hero)
+    }
+}
+
+#[derive(Debug, Component)]
+struct UpgradeChoice {
+    upgrade: Upgrade,
+}
+
+fn build_upgrades(parent_cmds: &mut RelatedSpawnerCommands<ChildOf>, choices: &[Upgrade]) {
+    if choices.is_empty() {
+        parent_cmds.spawn(Text::new("No available towers / upgrades"));
+    } else {
+        for entry in choices.iter() {
+            parent_cmds.spawn((
+                UpgradeChoice {
+                    upgrade: entry.clone(),
+                },
+                Node {
+                    display: Display::Flex,
+                    flex_direction: FlexDirection::Row,
+                    align_items: AlignItems::Center,
+                    height: percent(50.),
+                    aspect_ratio: Some(1.),
+                    //min_width: px(200.),
+                    flex_grow: 1.,
+                    ..default()
+                },
+                children![
+                    (
+                        Text::new(format!(
+                            "{:?} lv. {} (+{:.1}%)",
+                            entry.kind,
+                            entry.level,
+                            (entry.value_modifier - 1.) * 100.
+                        )),
+                        TextFont {
+                            font_size: 10.,
+                            ..default()
+                        },
+                    ),
+                    TextColor(Color::BLACK),
+                ],
+            ));
+            //.observe(replace_slot);
+        }
     }
 }
