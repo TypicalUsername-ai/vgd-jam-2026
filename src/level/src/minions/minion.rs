@@ -4,6 +4,7 @@ use bevy::prelude::*;
 #[derive(Debug, Component, Clone)]
 pub struct Minion {
     pub kind: MinionKind,
+    pub max_health: f32,
     pub health: f32,
     pub speed: f32,
     pub distance_traveled: f32,

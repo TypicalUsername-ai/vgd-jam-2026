@@ -1,11 +1,8 @@
-use std::ops::Deref;
-
 use crate::{
     buildings::{ActiveHero, HeroConfig, HeroConfigs, HeroKind},
     ui_assets::UiAssets,
 };
 use bevy::{ecs::relationship::RelatedSpawnerCommands, prelude::*};
-use serde::Deserialize;
 
 use super::map_config::LevelMapConfig;
 
@@ -18,9 +15,20 @@ pub struct MenuFor(Entity);
 pub struct AvailableMenus(Vec<Entity>);
 
 /// a single point which can hold a single [ActiveHero]
-#[derive(Debug, Component, Default)]
+#[derive(Debug, Component)]
 pub(crate) struct HeroSlot {
     pub hero: Option<ActiveHero>,
+    pub tracker_id: Entity,
+}
+
+impl HeroSlot {
+    #[must_use]
+    pub(crate) fn new(hp_tracker: Entity) -> Self {
+        Self {
+            tracker_id: hp_tracker,
+            hero: None,
+        }
+    }
 }
 
 pub(crate) fn setup_hero_slots(
@@ -33,11 +41,11 @@ pub(crate) fn setup_hero_slots(
         .spawn((
             Node {
                 display: Display::Grid,
-                width: px(250.),
+                width: px(300.),
                 height: percent(100.),
                 row_gap: px(10.),
                 padding: UiRect::axes(percent(0.), percent(1.)),
-                grid_template_columns: vec![GridTrack::percent(100.)],
+                grid_template_columns: vec![GridTrack::percent(20.), GridTrack::percent(80.)],
                 grid_template_rows: vec![RepeatedGridTrack::percent(4, 24.)],
                 ..default()
             },
@@ -45,12 +53,19 @@ pub(crate) fn setup_hero_slots(
         ))
         .with_children(|cs| {
             for i in 0..4 {
-                cs.spawn((
-                    HeroSlot::default(),
-                    ImageNode::solid_color(Color::BLACK.with_alpha(0.)),
-                ))
-                .observe(build_spot_menu)
-                .with_child(ImageNode::new(ui_assets.portrait_bg.clone()));
+                let bar_id = cs
+                    .spawn((
+                        ImageNode::from_atlas_image(
+                            ui_assets.hp_bar.clone(),
+                            TextureAtlas {
+                                layout: ui_assets.hp_bar_layout.clone(),
+                                index: 0,
+                            },
+                        ),
+                        TracksHpFor(vec![]),
+                    ))
+                    .id();
+                build_portrait(cs, &ui_assets.portrait_bg, bar_id);
             }
         });
     /*
@@ -67,18 +82,44 @@ pub(crate) fn setup_hero_slots(
     */
 }
 
+fn build_portrait(
+    spawner: &mut RelatedSpawnerCommands<ChildOf>,
+    background: &Handle<Image>,
+    tracker_id: Entity,
+) {
+    spawner
+        .spawn((
+            Node {
+                width: percent(100.),
+                ..default()
+            },
+            HeroSlot::new(tracker_id),
+            ImageNode::solid_color(Color::BLACK.with_alpha(0.)),
+        ))
+        .observe(build_spot_menu)
+        .with_child(ImageNode::new(background.clone()));
+}
+
+#[derive(Debug, Component)]
+#[relationship(relationship_target = TracksHpFor)]
+pub(crate) struct HpTracker(pub Entity);
+
+#[derive(Debug, Component)]
+#[relationship_target(relationship = HpTracker)]
+pub(crate) struct TracksHpFor(Vec<Entity>);
+
 #[derive(Debug, Component)]
 struct BuildContextMenu {}
 
 //type BuildMenuQuery<'a> = (Entity, &'a mut BuildingSpot);
 fn build_spot_menu(
     event: On<Pointer<Click>>,
-    window_query: Single<&Window>,
     mut commands: Commands,
     query: Query<(Entity, &HeroSlot)>,
     level_config: Res<LevelMapConfig>,
     hero_configs: Res<HeroConfigs>,
     ctx_query: Query<Entity, With<BuildContextMenu>>,
+    ui_assets: Res<UiAssets>,
 ) {
     if let Some(ctx) = ctx_query.iter().next() {
         commands.entity(ctx).despawn_children().despawn();
@@ -88,7 +129,6 @@ fn build_spot_menu(
         .iter()
         .find(|&qi| qi.0 == event.entity)
         .expect("This entity triggered the event");
-    let cursor_position = window_query.cursor_position().expect("cursor on screen");
     let bundle = (
         BuildContextMenu {},
         Node {
@@ -103,7 +143,7 @@ fn build_spot_menu(
             align_items: AlignItems::Center,
             ..default()
         },
-        BackgroundColor(Color::srgb_u8(0, 20, 100)),
+        ImageNode::new(ui_assets.portrait_bg.clone()),
         MenuFor(slot_entity),
         Pickable::IGNORE,
     );

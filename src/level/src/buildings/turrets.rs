@@ -1,5 +1,6 @@
 use crate::AnimationState;
 use crate::buildings::TurretKind;
+use crate::level_map::TracksHpFor;
 use crate::minions::Minion;
 use bevy::prelude::*;
 
@@ -9,6 +10,7 @@ pub(crate) fn fire_turrets(
     mut commands: Commands,
     mut turret_query: Query<(&mut Turret, &Transform)>,
     mut minions_query: Query<(Entity, &mut Minion, &Transform)>,
+    mut tracker_query: Query<(&TracksHpFor, &mut ImageNode)>,
     time: Res<Time>,
 ) {
     // iter over turrets
@@ -23,11 +25,24 @@ pub(crate) fn fire_turrets(
                 let (entity, mut minion, minion_transform) = minions_query
                     .get_mut(target)
                     .expect("The minion fired on exists");
+                info!("{:?}", tracker_query);
+                let (tracked, mut tracker_sprite) = tracker_query
+                    .iter_mut()
+                    .find(|(t, _s)| t.collection().contains(&target))
+                    .expect("every entity health should be tracked");
+                let mut atlas = tracker_sprite
+                    .texture_atlas
+                    .as_mut()
+                    .expect("hp bar should have atlas");
+                let new_index = ((1. - minion.health / minion.max_health) * 10.).round() as usize;
+                atlas.index = new_index;
+                //warn!("{}/{} -> {}", minion.health, minion.max_health, new_index);
                 minion.health -= turret.damage;
                 info!("{:?} shot at {:?} ({})", turret, minion.kind, minion.health);
                 if minion.health <= f32::EPSILON {
                     info!("Minion {}, has died", entity);
                     commands.entity(entity).despawn();
+                    atlas.index = 10;
                     turret.firing_on = None;
                 }
                 //(turret.shoot_function)(&mut commands, *entity);

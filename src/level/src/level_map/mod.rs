@@ -8,8 +8,8 @@ use bevy::prelude::*;
 use state::LevelState;
 
 pub(crate) use controls::setup_controls;
-pub(crate) use hero_slots::HeroSlot;
 pub(crate) use hero_slots::setup_hero_slots;
+pub(crate) use hero_slots::{HeroSlot, HpTracker, TracksHpFor};
 pub(crate) use map_background::setup_background;
 pub(crate) use map_config::LevelMapConfig;
 pub(crate) use path::setup_path;

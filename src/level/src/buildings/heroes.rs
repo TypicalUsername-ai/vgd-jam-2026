@@ -22,7 +22,11 @@ pub(crate) fn spawn_minions(
             minion_configs
                 .get(&hero.spawned_minion)
                 .unwrap_or_else(|| panic!("minion {:?} is not configured", hero.spawned_minion))
-                .spawn(&mut commands, level_config.path_points[0].clone());
+                .spawn(
+                    &mut commands,
+                    slot.tracker_id,
+                    level_config.path_points[0].clone(),
+                );
         }
     }
 }

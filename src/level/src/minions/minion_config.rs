@@ -1,5 +1,6 @@
 use super::minion::MinionKind;
 use crate::animation::{Action, ActionLocation, AnimationState};
+use crate::level_map::HpTracker;
 use crate::minions::Minion;
 use bevy::prelude::*;
 use std::collections::HashMap;
@@ -16,7 +17,7 @@ pub(crate) struct MinionConfig {
 }
 
 impl MinionConfig {
-    pub fn spawn(&self, commands: &mut Commands, spawn_location: Vec3) {
+    pub fn spawn(&self, commands: &mut Commands, hp_tracker_id: Entity, spawn_location: Vec3) {
         commands.spawn((
             Sprite::from_atlas_image(
                 self.sprite.clone(),
@@ -26,6 +27,7 @@ impl MinionConfig {
                 },
             ),
             self.minion.clone(),
+            HpTracker(hp_tracker_id),
             Transform::from_translation(spawn_location),
             AnimationState::new(
                 0.25,
@@ -46,6 +48,7 @@ impl MinionConfig {
         Self {
             minion: Minion {
                 kind: value.kind,
+                max_health: value.health,
                 health: value.health,
                 speed: value.speed,
                 distance_traveled: 0.,
