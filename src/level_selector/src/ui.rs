@@ -10,12 +10,12 @@ pub(crate) struct LevelSelectMenu {}
 #[derive(Debug, Component)]
 #[require(Button)]
 pub(crate) struct SaveSelectButton {
-    pub(crate) save: SaveGameState,
+    pub(crate) save: Option<SaveGameState>,
 }
 
 pub(crate) fn react_buttons(
     query: Query<(&SaveSelectButton, &Interaction), Changed<Interaction>>,
-    lvl_config: Res<SaveSelectConfig>,
+    mut lvl_config: ResMut<SaveSelectConfig>,
     mut next_global: ResMut<NextState<GlobalState>>,
     mut next_level: ResMut<NextState<LevelState>>,
 ) {
@@ -23,8 +23,16 @@ pub(crate) fn react_buttons(
         match *interaction {
             Interaction::Pressed => {
                 warn!("Pressed a button {:?}", button);
+                let save = match button.save.as_ref() {
+                    Some(s) => s,
+                    None => {
+                        let new_save = new_save_file();
+                        lvl_config.saves.push(new_save.clone());
+                        lvl_config.saves.last().expect("just added one")
+                    }
+                };
                 next_level.set(LevelState::load(
-                    button.save.current_level_id.clone(),
+                    save.current_level_id.clone(),
                     lvl_config.map_config_folder.clone(),
                 ));
                 next_global.set(GlobalState::ActiveLevel);
@@ -52,7 +60,7 @@ pub(crate) fn draw_level_select(mut commands: Commands, saves_config: Res<SaveSe
             LevelSelectMenu {},
         ))
         .with_children(|parent| {
-            parent.spawn(level_select_title("Select level"));
+            parent.spawn(level_select_title("Load game save"));
             parent
                 .spawn(
                     Node {
@@ -66,6 +74,10 @@ pub(crate) fn draw_level_select(mut commands: Commands, saves_config: Res<SaveSe
                     // BackgroundColor(tailwind::BLUE_300.into()),
                 )
                 .with_children(|level_pane| {
+                    level_pane.spawn(make_button(
+                        "New game save",
+                        SaveSelectButton { save: None },
+                    ));
                     for configuration in saves_config.saves.iter() {
                         level_pane.spawn(make_button(
                             format!(
@@ -74,7 +86,7 @@ pub(crate) fn draw_level_select(mut commands: Commands, saves_config: Res<SaveSe
                                 configuration.current_level_id.clone()
                             ),
                             SaveSelectButton {
-                                save: configuration.clone(),
+                                save: Some(configuration.clone()),
                             },
                         ));
                     }
@@ -134,4 +146,11 @@ fn make_button(text: impl Into<String>, component: impl Component) -> impl Bundl
         BackgroundColor(Color::WHITE),
         component,
     )
+}
+
+fn new_save_file() -> SaveGameState {
+    SaveGameState {
+        save_name: "New Save aaa".to_owned(),
+        current_level_id: "tutorial".to_owned(),
+    }
 }
