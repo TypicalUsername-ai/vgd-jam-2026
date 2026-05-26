@@ -61,7 +61,12 @@ pub(crate) fn spawn_heroes(
             let avatar = minion_configs
                 .get(&hero.spawned_minion)
                 .unwrap_or_else(|| panic!("minion {:?} has no config", &hero.spawned_minion));
-            avatar.spawn(&mut commands, slot.tracker_id, level_config.path_points[0]);
+            avatar.spawn(
+                &mut commands,
+                &hero.applied_upgrades,
+                slot.tracker_id,
+                level_config.path_points[0],
+            );
         }
     }
 }

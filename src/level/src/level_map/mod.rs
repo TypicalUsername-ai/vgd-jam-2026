@@ -10,7 +10,7 @@ use level_selector::SaveGameState;
 
 pub(crate) use controls::{draw_loss_screen, draw_win_screen, setup_controls, spawn_heroes};
 pub(crate) use hero_slots::setup_hero_slots;
-pub(crate) use hero_slots::{HeroSlot, HpTracker, TracksHpFor};
+pub(crate) use hero_slots::{HeroSlot, HpTracker, TracksHpFor, roll_upgrades};
 pub(crate) use map_background::setup_background;
 pub(crate) use map_config::LevelMapConfig;
 pub(crate) use path::setup_path;

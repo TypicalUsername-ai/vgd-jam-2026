@@ -1,5 +1,6 @@
 use super::minion::MinionKind;
 use crate::animation::{Action, ActionLocation, AnimationState};
+use crate::heroes::UpgradeChoice;
 use crate::level_map::HpTracker;
 use crate::minions::Minion;
 use bevy::prelude::*;
@@ -18,7 +19,17 @@ pub(crate) struct MinionConfig {
 }
 
 impl MinionConfig {
-    pub fn spawn(&self, commands: &mut Commands, hp_tracker_id: Entity, spawn_location: Vec3) {
+    pub fn spawn(
+        &self,
+        commands: &mut Commands,
+        upgrades: &[UpgradeChoice],
+        hp_tracker_id: Entity,
+        spawn_location: Vec3,
+    ) {
+        let mut minion = self.minion.clone();
+        for upgrade in upgrades {
+            upgrade.apply(&mut minion);
+        }
         commands.spawn((
             DespawnOnExit(LevelState::Active),
             Sprite::from_atlas_image(
@@ -28,7 +39,7 @@ impl MinionConfig {
                     index: 0,
                 },
             ),
-            self.minion.clone(),
+            minion,
             HpTracker(hp_tracker_id),
             Transform::from_translation(spawn_location),
             AnimationState::new(

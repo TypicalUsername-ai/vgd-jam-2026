@@ -1,6 +1,9 @@
 use super::map_config::LevelMapConfig;
 use crate::{
-    heroes::{ActiveHero, HeroConfig, HeroConfigs, Upgrade, UpgradeKind},
+    heroes::{
+        ActiveHero, AvailableUpgrades, HeroConfig, HeroConfigs, Upgrade, UpgradeChoice,
+        UpgradeKind, UpgradePoints,
+    },
     ui_assets::UiAssets,
 };
 use bevy::{ecs::relationship::RelatedSpawnerCommands, prelude::*};
@@ -72,12 +75,19 @@ fn build_portrait(
         .observe(super::hero_modifiers::build_spot_menu)
         .with_child(ImageNode::new(background.clone()))
         .id();
-    spawner.commands().spawn_batch([
-        Upgrade::new(hero_id, UpgradeKind::Speed, 1),
-        Upgrade::new(hero_id, UpgradeKind::Health, 1),
-        Upgrade::new(hero_id, UpgradeKind::Speed, 2),
-        Upgrade::new(hero_id, UpgradeKind::Health, 2),
-    ]);
+}
+
+pub fn roll_upgrades(mut commands: Commands, config: Res<LevelMapConfig>) {
+    let rolls = [
+        UpgradeChoice::roll(UpgradeKind::Speed, 1),
+        UpgradeChoice::roll(UpgradeKind::Health, 1),
+        UpgradeChoice::roll(UpgradeKind::Speed, 2),
+        UpgradeChoice::roll(UpgradeKind::Health, 2),
+    ]
+    .into_iter()
+    .collect();
+    commands.insert_resource(AvailableUpgrades(rolls));
+    commands.insert_resource(UpgradePoints(config.upgrade_points));
 }
 
 #[derive(Debug, Component)]

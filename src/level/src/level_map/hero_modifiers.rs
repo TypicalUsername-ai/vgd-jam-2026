@@ -1,5 +1,10 @@
+use std::collections::HashSet;
+use std::ops::{Deref, SubAssign};
+
 use super::{HeroSlot, LevelMapConfig};
-use crate::heroes::{ActiveHero, HeroConfig, HeroConfigs, Upgrade};
+use crate::heroes::{
+    ActiveHero, AvailableUpgrades, HeroConfig, HeroConfigs, Upgrade, UpgradeChoice, UpgradePoints,
+};
 use crate::ui_assets::UiAssets;
 use bevy::ecs::relationship::RelatedSpawnerCommands;
 use bevy::prelude::*;
@@ -23,7 +28,7 @@ pub(crate) fn build_spot_menu(
     level_config: Res<LevelMapConfig>,
     hero_configs: Res<HeroConfigs>,
     ctx_query: Query<Entity, With<BuildContextMenu>>,
-    upgrades_query: Query<&Upgrade>,
+    mut upgrades: ResMut<AvailableUpgrades>,
     ui_assets: Res<UiAssets>,
 ) {
     if let Some(ctx) = ctx_query.iter().next() {
@@ -54,16 +59,7 @@ pub(crate) fn build_spot_menu(
     let mut e_cmds = commands.spawn(bundle);
     e_cmds.set_parent_in_place(slot_entity);
     if let Some(hero) = &slot.hero {
-        e_cmds.with_children(|parent_cmds| {
-            build_upgrades(
-                parent_cmds,
-                &upgrades_query
-                    .iter()
-                    .filter(|u| u.hero == slot_entity)
-                    .collect::<Vec<&Upgrade>>(),
-                hero,
-            )
-        });
+        e_cmds.with_children(|parent_cmds| build_upgrades(parent_cmds, &mut upgrades, hero));
     } else {
         let available_configs: Vec<&HeroConfig> = hero_configs
             .iter()
@@ -130,20 +126,15 @@ fn replace_slot(
     }
 }
 
-#[derive(Debug, Component)]
-struct UpgradeChoice {
-    upgrade: Upgrade,
-}
-
 fn build_upgrades(
     parent_cmds: &mut RelatedSpawnerCommands<ChildOf>,
-    choices: &[&Upgrade],
+    choices: &mut HashSet<UpgradeChoice>,
     hero: &ActiveHero,
 ) {
     if choices.is_empty() {
         parent_cmds.spawn(Text::new("No available towers / upgrades"));
     } else {
-        for entry in choices.into_iter() {
+        for upgrade in choices.iter() {
             parent_cmds
                 .spawn((
                     Node {
@@ -156,13 +147,12 @@ fn build_upgrades(
                         flex_grow: 1.,
                         ..default()
                     },
+                    (*upgrade),
                     children![
                         (
                             Text::new(format!(
                                 "{:?} lv. {} (+{:.1}%)",
-                                entry.kind,
-                                entry.level,
-                                (entry.value_modifier - 1.) * 100.
+                                upgrade.kind, upgrade.level, upgrade.bonus
                             )),
                             TextFont {
                                 font_size: 10.,
@@ -180,17 +170,28 @@ fn build_upgrades(
 fn add_upgrade(
     event: On<Pointer<Click>>,
     mut commands: Commands,
-    mut hero_query: Query<&mut HeroSlot, With<AvailableMenus>>,
+    mut slot_query: Query<&mut HeroSlot, With<AvailableMenus>>,
+    mut all_upgrades: ResMut<AvailableUpgrades>,
+    mut upgrade_points: ResMut<UpgradePoints>,
     upgrades_query: Query<(Entity, &UpgradeChoice)>,
 ) {
     let (upgrade_id, chosen_upgrade) = upgrades_query
         .iter()
         .find(|(e, _u)| e == &event.entity)
         .expect("should trigger on clicked upgrade");
-    let hero = hero_query
+    let mut slot = slot_query
         .iter_mut()
         .next()
         .expect("single hero selection should work");
-    //chosen_upgrade.applied = true;
-    warn!("UPGRADE!! {:?}, {:?}", hero, chosen_upgrade);
+
+    if upgrade_points.ge(&chosen_upgrade.level) {
+        slot.hero
+            .as_mut()
+            .expect("has hero")
+            .applied_upgrades
+            .push(*chosen_upgrade);
+        all_upgrades.remove(chosen_upgrade);
+        upgrade_points.sub_assign(chosen_upgrade.level);
+    }
+    warn!("UPGRADE!! {:?}, {:?}", slot.hero, chosen_upgrade);
 }
