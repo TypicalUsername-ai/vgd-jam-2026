@@ -8,7 +8,9 @@ mod turret_point;
 use bevy::prelude::*;
 use level_selector::SaveGameState;
 
-pub(crate) use controls::{draw_loss_screen, draw_win_screen, setup_controls, spawn_heroes};
+pub(crate) use controls::{
+    draw_loss_screen, draw_win_screen, ingame_pause, setup_controls, spawn_heroes,
+};
 pub(crate) use hero_slots::setup_hero_slots;
 pub(crate) use hero_slots::{HeroSlot, HpTracker, TracksHpFor, roll_upgrades};
 pub(crate) use map_background::setup_background;

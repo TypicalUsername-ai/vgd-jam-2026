@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use level_selector::SaveGameState;
-use state::LevelState;
+use state::{LevelState, PauseState};
 
 use crate::{
     level_map::{HeroSlot, LevelMapConfig},
@@ -23,19 +23,23 @@ pub(crate) fn setup_controls(mut commands: Commands) {
                 ..default()
             },
             BackgroundColor(Color::srgb_u8(155, 0, 120)),
-            children![Text::new("Start level")],
+            children![Text::new("Start / Reset level")],
         ))
         .observe(start_level);
 
-    commands.spawn((
-        Node {
-            right: percent(5.),
-            top: px(0.),
-            ..default()
-        },
-        BackgroundColor(Color::srgb_u8(120, 120, 0)),
-        children![Text::new("Pause / Settings")],
-    ));
+    commands
+        .spawn((
+            Node {
+                //right: percent(5.),
+                align_self: AlignSelf::Start,
+                justify_self: JustifySelf::End,
+                top: px(0.),
+                ..default()
+            },
+            BackgroundColor(Color::srgb_u8(120, 120, 0)),
+            children![Text::new("Pause / Settings")],
+        ))
+        .observe(toggle_pause);
 }
 
 pub fn start_level(
@@ -168,4 +172,34 @@ pub(crate) fn draw_loss_screen(mut commands: Commands) {
 
 fn reload_level(_event: On<Pointer<Click>>, mut next_level_state: ResMut<NextState<LevelState>>) {
     next_level_state.set(LevelState::Pre);
+}
+
+pub(crate) fn ingame_pause(mut commands: Commands) {
+    commands.spawn((
+        Node {
+            width: percent(60.),
+            height: percent(60.),
+            display: Display::Flex,
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            flex_direction: FlexDirection::Column,
+            align_self: AlignSelf::Center,
+            justify_self: JustifySelf::Center,
+            ..default()
+        },
+        BackgroundColor(Color::srgb_u8(0, 40, 40)),
+        DespawnOnExit(PauseState::Paused),
+    ));
+}
+
+fn toggle_pause(
+    _event: On<Pointer<Click>>,
+    pause_state: Res<State<PauseState>>,
+    mut next_pause_state: ResMut<NextState<PauseState>>,
+) {
+    let next_state = match **pause_state {
+        PauseState::Paused => PauseState::Running,
+        PauseState::Running => PauseState::Paused,
+    };
+    next_pause_state.set(next_state);
 }

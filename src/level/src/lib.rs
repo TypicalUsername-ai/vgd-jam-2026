@@ -46,6 +46,10 @@ impl Plugin for LevelPlugin {
                 .chain(),
         );
         app.add_systems(
+            OnEnter(PauseState::Paused),
+            level_map::ingame_pause.run_if(in_state(GlobalState::ActiveLevel)),
+        );
+        app.add_systems(
             OnEnter(LevelState::Active),
             (level_map::spawn_heroes).chain(),
         );
