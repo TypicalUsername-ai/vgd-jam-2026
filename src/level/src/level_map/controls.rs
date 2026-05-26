@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use level_selector::SaveGameState;
 use state::LevelState;
 
 use crate::{
@@ -72,22 +73,99 @@ pub(crate) fn spawn_heroes(
 }
 
 pub(crate) fn draw_win_screen(mut commands: Commands) {
-    commands.spawn((
+    let mut base = commands.spawn((
         Node {
-            width: percent(80.),
-            height: percent(80.),
+            width: percent(100.),
+            height: percent(100.),
+            display: Display::Flex,
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            flex_direction: FlexDirection::Column,
             ..default()
         },
-        BackgroundColor(Color::WHITE),
+        BackgroundColor(Color::WHITE.with_alpha(90.)),
+        DespawnOnExit(LevelState::Won),
     ));
+
+    base.with_children(|pane| {
+        pane.spawn(Text::new("YOU WON!!"));
+        let mut center = pane.spawn((
+            Node {
+                width: percent(40.),
+                height: percent(40.),
+                display: Display::Flex,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::SpaceAround,
+                align_content: AlignContent::SpaceBetween,
+                flex_direction: FlexDirection::Column,
+                ..default()
+            },
+            TextColor(Color::BLACK),
+            BackgroundColor(Color::srgb_u8(10, 60, 0)),
+        ));
+        center.with_children(|center_pane| {
+            center_pane.spawn(Text::new("YOU WON!"));
+            center_pane
+                .spawn(Text::new("next level"))
+                .observe(load_next_level);
+        });
+    });
 }
+
+fn load_next_level(
+    event: On<Pointer<Click>>,
+    level_config: Res<LevelMapConfig>,
+    mut save_game: ResMut<SaveGameState>,
+    mut next_level_state: ResMut<NextState<LevelState>>,
+) {
+    let next_level = level_config
+        .next_level_id
+        .as_ref()
+        .expect("There is a level");
+    save_game.current_level_id = next_level.to_owned();
+    next_level_state.set(LevelState::Pre);
+}
+
 pub(crate) fn draw_loss_screen(mut commands: Commands) {
-    commands.spawn((
+    let mut base = commands.spawn((
         Node {
-            width: percent(80.),
-            height: percent(80.),
+            width: percent(100.),
+            height: percent(100.),
+            display: Display::Flex,
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            flex_direction: FlexDirection::Column,
             ..default()
         },
-        BackgroundColor(Color::WHITE),
+        DespawnOnExit(LevelState::Lost),
+        BackgroundColor(Color::WHITE.with_alpha(90.)),
     ));
+
+    base.with_children(|pane| {
+        pane.spawn(Text::new("YOU WON!!"));
+        let mut center = pane.spawn((
+            Node {
+                width: percent(40.),
+                height: percent(40.),
+                display: Display::Flex,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::SpaceAround,
+                align_content: AlignContent::SpaceBetween,
+                flex_direction: FlexDirection::Column,
+                ..default()
+            },
+            TextColor(Color::BLACK),
+            BackgroundColor(Color::srgb_u8(60, 10, 0)),
+        ));
+        center.with_children(|center_pane| {
+            center_pane.spawn(Text::new("YOU LOST..."));
+            center_pane
+                .spawn(Text::new("retry level"))
+                .observe(reload_level);
+        });
+    });
+}
+
+fn reload_level(event: On<Pointer<Click>>, mut next_level_state: ResMut<NextState<LevelState>>) {
+    next_level_state.set(LevelState::Pre);
 }

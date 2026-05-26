@@ -7,6 +7,7 @@ use crate::{
     ui_assets::UiAssets,
 };
 use bevy::{ecs::relationship::RelatedSpawnerCommands, prelude::*};
+use state::LevelState;
 /// a single point which can hold a single [ActiveHero]
 #[derive(Debug, Component)]
 pub(crate) struct HeroSlot {
@@ -37,6 +38,7 @@ pub(crate) fn setup_hero_slots(mut commands: Commands, ui_assets: Res<UiAssets>)
                 grid_template_rows: vec![RepeatedGridTrack::percent(4, 24.)],
                 ..default()
             },
+            DespawnOnExit(LevelState::Active),
             //ImageNode::new(texture),
         ))
         .with_children(|cs| {

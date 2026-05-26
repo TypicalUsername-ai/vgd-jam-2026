@@ -1,6 +1,7 @@
 use crate::animation::Action;
 use bevy::prelude::*;
 use serde::Deserialize;
+use state::LevelState;
 
 use super::LevelMapConfig;
 use crate::{
@@ -29,6 +30,7 @@ pub(crate) fn setup_turrets(
             .expect("All turret configs should be loaded!");
         commands.spawn((
             conf.building.clone(),
+            DespawnOnExit(LevelState::Active),
             Transform::from_translation(entry.position),
             Sprite::from_atlas_image(
                 conf.sprite.clone(),

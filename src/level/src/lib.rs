@@ -33,7 +33,7 @@ impl Plugin for LevelPlugin {
             app.get_asset_server(),
         ));
         app.add_systems(
-            OnEnter(GlobalState::ActiveLevel),
+            OnEnter(LevelState::Pre),
             (
                 level_map::load_level,
                 level_map::setup_background,
@@ -43,9 +43,9 @@ impl Plugin for LevelPlugin {
                 level_map::roll_upgrades,
                 level_map::setup_controls,
             )
+                .run_if(in_state(GlobalState::ActiveLevel))
                 .chain(),
         );
-        //app.add_systems(OnEnter(LevelState::Pre), ());
         app.add_systems(
             OnEnter(LevelState::Active),
             (level_map::spawn_heroes).chain(),

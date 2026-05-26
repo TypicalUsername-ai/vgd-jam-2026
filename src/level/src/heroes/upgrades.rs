@@ -18,9 +18,9 @@ impl std::cmp::Eq for UpgradeChoice {}
 impl UpgradeChoice {
     pub fn roll(kind: UpgradeKind, level: u8) -> Self {
         let modifier_range = match level {
-            1 => 10..=30,
-            2 => 30..=50,
-            3 => 50..=70,
+            1 => 5..=15,
+            2 => 15..=25,
+            3 => 25..=35,
             _ => unimplemented!(),
         };
         Self {
