@@ -1,5 +1,5 @@
 use bevy::{asset::io::embedded::GetAssetServer, prelude::*};
-use state::{GlobalState, LevelState};
+use state::{GlobalState, LevelState, PauseState};
 use std::path::PathBuf;
 mod ui_assets;
 
@@ -58,7 +58,7 @@ impl Plugin for LevelPlugin {
                 animation::animate_all,
             )
                 .chain()
-                .run_if(in_state(LevelState::Active)),
+                .run_if(in_state(LevelState::Active).and(in_state(PauseState::Running))),
         );
         app.add_systems(OnEnter(LevelState::Won), (level_map::draw_win_screen));
         app.add_systems(OnEnter(LevelState::Lost), (level_map::draw_loss_screen));
