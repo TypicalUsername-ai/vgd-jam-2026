@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use chrono::{DateTime, Utc};
 use state::{GlobalState, LevelState};
 use tracing::warn;
 
@@ -149,8 +150,9 @@ fn make_button(text: impl Into<String>, component: impl Component) -> impl Bundl
 }
 
 fn new_save_file() -> SaveGameState {
+    let ts = Utc::now();
     SaveGameState {
-        save_name: "New Save aaa".to_owned(),
+        save_name: format!("Save {}", ts),
         current_level_id: "tutorial".to_owned(),
     }
 }
