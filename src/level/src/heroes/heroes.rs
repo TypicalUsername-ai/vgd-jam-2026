@@ -9,6 +9,7 @@ pub(crate) struct ActiveHero {
     pub spawner_kind: HeroKind,
     pub spawn_timer: Timer,
     pub spawned_minion: MinionKind,
+    pub applied_upgrades: Vec<super::Upgrade>,
 }
 
 impl ActiveHero {

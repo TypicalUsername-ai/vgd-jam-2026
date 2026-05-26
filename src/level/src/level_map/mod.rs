@@ -1,4 +1,5 @@
 mod controls;
+mod hero_modifiers;
 mod hero_slots;
 mod map_background;
 mod map_config;

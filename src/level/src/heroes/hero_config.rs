@@ -41,6 +41,7 @@ impl HeroConfig {
             spawner_kind: value.kind,
             spawn_timer: Timer::from_seconds(value.spawn_time, TimerMode::Repeating),
             spawned_minion: value.spawned_minion,
+            applied_upgrades: vec![],
         };
         let atlas_layout =
             TextureAtlasLayout::from_grid(value.tile_size, cols as u32, rows as u32, None, None);
