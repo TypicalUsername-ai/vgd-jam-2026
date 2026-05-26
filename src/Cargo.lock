@@ -3318,6 +3318,7 @@ name = "level"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "level_selector",
  "rand 0.10.1",
  "ron",
  "serde",

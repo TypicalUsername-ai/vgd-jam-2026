@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use state::LevelState;
 
 use crate::{
     level_map::{HeroSlot, LevelMapConfig},
@@ -36,8 +37,19 @@ pub(crate) fn setup_controls(mut commands: Commands) {
     ));
 }
 
-fn start_level(
+pub fn start_level(
     event: On<Pointer<Click>>,
+    level_state: Res<State<LevelState>>,
+    mut next_level_state: ResMut<NextState<LevelState>>,
+) {
+    match **level_state {
+        LevelState::Pre => next_level_state.set(LevelState::Active),
+        LevelState::Active => next_level_state.set(LevelState::Pre),
+        LevelState::Post => next_level_state.set(LevelState::Pre),
+    }
+}
+
+pub(crate) fn spawn_heroes(
     mut commands: Commands,
     portraits: Query<&HeroSlot>,
     minion_configs: Res<MinionConfigs>,
@@ -51,5 +63,4 @@ fn start_level(
             avatar.spawn(&mut commands, slot.tracker_id, level_config.path_points[0]);
         }
     }
-    info!("event!! {:?}", event);
 }

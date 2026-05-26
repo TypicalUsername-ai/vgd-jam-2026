@@ -3,6 +3,7 @@ use crate::animation::{Action, ActionLocation, AnimationState};
 use crate::level_map::HpTracker;
 use crate::minions::Minion;
 use bevy::prelude::*;
+use state::LevelState;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
@@ -19,6 +20,7 @@ pub(crate) struct MinionConfig {
 impl MinionConfig {
     pub fn spawn(&self, commands: &mut Commands, hp_tracker_id: Entity, spawn_location: Vec3) {
         commands.spawn((
+            DespawnOnExit(LevelState::Active),
             Sprite::from_atlas_image(
                 self.sprite.clone(),
                 TextureAtlas {

@@ -15,6 +15,7 @@ pub(crate) struct SaveSelectButton {
 }
 
 pub(crate) fn react_buttons(
+    mut commands: Commands,
     query: Query<(&SaveSelectButton, &Interaction), Changed<Interaction>>,
     mut lvl_config: ResMut<SaveSelectConfig>,
     mut next_global: ResMut<NextState<GlobalState>>,
@@ -32,10 +33,8 @@ pub(crate) fn react_buttons(
                         lvl_config.saves.last().expect("just added one")
                     }
                 };
-                next_level.set(LevelState::load(
-                    save.current_level_id.clone(),
-                    lvl_config.map_config_folder.clone(),
-                ));
+                commands.insert_resource(save.to_owned());
+                next_level.set(LevelState::Pre);
                 next_global.set(GlobalState::ActiveLevel);
             }
             Interaction::Hovered => (),

@@ -6,9 +6,9 @@ mod map_config;
 mod path;
 mod turret_point;
 use bevy::prelude::*;
-use state::LevelState;
+use level_selector::SaveGameState;
 
-pub(crate) use controls::setup_controls;
+pub(crate) use controls::{setup_controls, spawn_heroes};
 pub(crate) use hero_slots::setup_hero_slots;
 pub(crate) use hero_slots::{HeroSlot, HpTracker, TracksHpFor};
 pub(crate) use map_background::setup_background;
@@ -19,18 +19,10 @@ pub(crate) use turret_point::setup_turrets;
 
 /// Loads the level based on current [LevelState] resource
 /// requires [Commands] for inserting a [LevelMapConfig] resource
-pub(crate) fn load_level(mut commands: Commands, current_level: Res<State<LevelState>>) {
-    match &**current_level {
-        LevelState::Active {
-            id: _,
-            map_config_path,
-        } => {
-            let map_conf = map_config::LevelMapConfig::from(map_config_path.as_path());
-            commands.insert_resource(map_conf);
-            info!("added resource");
-        }
-        a => {
-            panic!("actually in resource {:?}", a);
-        }
-    };
+pub(crate) fn load_level(mut commands: Commands, save: Res<SaveGameState>) {
+    let map_conf = map_config::LevelMapConfig::from(
+        std::path::PathBuf::from(format!("../assets/maps/{}.ron", save.current_level_id)).as_path(),
+    );
+    commands.insert_resource(map_conf);
+    info!("added resource");
 }

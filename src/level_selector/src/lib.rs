@@ -5,7 +5,7 @@ mod level_config;
 mod level_select_config;
 mod ui;
 
-pub use level_config::LevelConfiguration;
+pub use level_config::{LevelConfiguration, SaveGameState};
 pub use level_select_config::SaveSelectConfig;
 
 use crate::ui::react_buttons;

@@ -1,5 +1,5 @@
 use bevy::{asset::io::embedded::GetAssetServer, prelude::*};
-use state::GlobalState;
+use state::{GlobalState, LevelState};
 use std::path::PathBuf;
 mod ui_assets;
 
@@ -44,6 +44,11 @@ impl Plugin for LevelPlugin {
             )
                 .chain(),
         );
+        //app.add_systems(OnEnter(LevelState::Pre), ());
+        app.add_systems(
+            OnEnter(LevelState::Active),
+            (level_map::spawn_heroes).chain(),
+        );
         app.add_systems(
             Update,
             (
@@ -52,8 +57,9 @@ impl Plugin for LevelPlugin {
                 animation::animate_all,
             )
                 .chain()
-                .run_if(in_state(GlobalState::ActiveLevel).and(resource_exists::<LevelMapConfig>)),
+                .run_if(in_state(LevelState::Active)),
         );
+        //app.add_systems(OnEnter(LevelState::Post), ());
     }
 }
 

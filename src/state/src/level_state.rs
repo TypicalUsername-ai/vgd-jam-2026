@@ -7,20 +7,8 @@ use std::path::PathBuf;
 pub enum LevelState {
     #[default]
     Pre,
-    Active {
-        id: String,
-        map_config_path: PathBuf,
-    },
+    Active,
     Post,
 }
 
-impl LevelState {
-    pub fn load(id: String, config_folder: PathBuf) -> Self {
-        let mut map_config_path = config_folder.join(id.clone());
-        map_config_path.add_extension("ron");
-        Self::Active {
-            id,
-            map_config_path, //       map_config: LevelMapConfig::from(format!("../assets/maps/{}.ron", value)),
-        }
-    }
-}
+//impl bevy::state::state::FreelyMutableState for LevelState {}
