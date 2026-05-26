@@ -59,7 +59,8 @@ impl Plugin for LevelPlugin {
                 .chain()
                 .run_if(in_state(LevelState::Active)),
         );
-        //app.add_systems(OnEnter(LevelState::Post), ());
+        app.add_systems(OnEnter(LevelState::Won), (level_map::draw_win_screen));
+        app.add_systems(OnEnter(LevelState::Lost), (level_map::draw_loss_screen));
     }
 }
 

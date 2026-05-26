@@ -45,7 +45,8 @@ pub fn start_level(
     match **level_state {
         LevelState::Pre => next_level_state.set(LevelState::Active),
         LevelState::Active => next_level_state.set(LevelState::Pre),
-        LevelState::Post => next_level_state.set(LevelState::Pre),
+        LevelState::Lost => todo!(),
+        LevelState::Won => todo!(),
     }
 }
 
@@ -63,4 +64,25 @@ pub(crate) fn spawn_heroes(
             avatar.spawn(&mut commands, slot.tracker_id, level_config.path_points[0]);
         }
     }
+}
+
+pub(crate) fn draw_win_screen(mut commands: Commands) {
+    commands.spawn((
+        Node {
+            width: percent(80.),
+            height: percent(80.),
+            ..default()
+        },
+        BackgroundColor(Color::WHITE),
+    ));
+}
+pub(crate) fn draw_loss_screen(mut commands: Commands) {
+    commands.spawn((
+        Node {
+            width: percent(80.),
+            height: percent(80.),
+            ..default()
+        },
+        BackgroundColor(Color::WHITE),
+    ));
 }

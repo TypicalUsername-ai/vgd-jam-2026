@@ -8,7 +8,8 @@ pub enum LevelState {
     #[default]
     Pre,
     Active,
-    Post,
+    Lost,
+    Won,
 }
 
 //impl bevy::state::state::FreelyMutableState for LevelState {}
