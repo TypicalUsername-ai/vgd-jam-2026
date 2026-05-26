@@ -1,4 +1,4 @@
-use super::turrets::Turret;
+use super::Turret;
 use crate::Action;
 use crate::animation::ActionLocation;
 use bevy::prelude::*;

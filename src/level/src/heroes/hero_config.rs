@@ -1,4 +1,4 @@
-use super::heroes::{ActiveHero, HeroKind};
+use super::active_hero::{ActiveHero, HeroKind};
 use crate::Action;
 use crate::animation::ActionLocation;
 use crate::minions::MinionKind;
@@ -39,7 +39,6 @@ impl HeroConfig {
         let cols = value.animations.iter().map(|a| a.1).max().unwrap_or(0);
         let hero = ActiveHero {
             spawner_kind: value.kind,
-            spawn_timer: Timer::from_seconds(value.spawn_time, TimerMode::Repeating),
             spawned_minion: value.spawned_minion,
             applied_upgrades: vec![],
         };
@@ -63,7 +62,6 @@ impl HeroConfig {
 #[serde(rename = "HeroConfig")]
 struct HeroConfigKeys {
     kind: HeroKind,
-    spawn_time: f32,
     animations: Vec<(Action, usize)>,
     sprite_path: PathBuf,
     tile_size: UVec2,

@@ -1,9 +1,9 @@
 use std::collections::HashSet;
-use std::ops::{Deref, SubAssign};
+use std::ops::SubAssign;
 
 use super::{HeroSlot, LevelMapConfig};
 use crate::heroes::{
-    ActiveHero, AvailableUpgrades, HeroConfig, HeroConfigs, Upgrade, UpgradeChoice, UpgradePoints,
+    ActiveHero, AvailableUpgrades, HeroConfig, HeroConfigs, UpgradeChoice, UpgradePoints,
 };
 use crate::ui_assets::UiAssets;
 use bevy::ecs::relationship::RelatedSpawnerCommands;
@@ -58,8 +58,8 @@ pub(crate) fn build_spot_menu(
     );
     let mut e_cmds = commands.spawn(bundle);
     e_cmds.set_parent_in_place(slot_entity);
-    if let Some(hero) = &slot.hero {
-        e_cmds.with_children(|parent_cmds| build_upgrades(parent_cmds, &mut upgrades, hero));
+    if let Some(_hero) = &slot.hero {
+        e_cmds.with_children(|parent_cmds| build_upgrades(parent_cmds, &mut upgrades));
     } else {
         let available_configs: Vec<&HeroConfig> = hero_configs
             .iter()
@@ -129,7 +129,6 @@ fn replace_slot(
 fn build_upgrades(
     parent_cmds: &mut RelatedSpawnerCommands<ChildOf>,
     choices: &mut HashSet<UpgradeChoice>,
-    hero: &ActiveHero,
 ) {
     if choices.is_empty() {
         parent_cmds.spawn(Text::new("No available towers / upgrades"));
@@ -169,13 +168,12 @@ fn build_upgrades(
 
 fn add_upgrade(
     event: On<Pointer<Click>>,
-    mut commands: Commands,
     mut slot_query: Query<&mut HeroSlot, With<AvailableMenus>>,
     mut all_upgrades: ResMut<AvailableUpgrades>,
     mut upgrade_points: ResMut<UpgradePoints>,
     upgrades_query: Query<(Entity, &UpgradeChoice)>,
 ) {
-    let (upgrade_id, chosen_upgrade) = upgrades_query
+    let (_upgrade_id, chosen_upgrade) = upgrades_query
         .iter()
         .find(|(e, _u)| e == &event.entity)
         .expect("should trigger on clicked upgrade");

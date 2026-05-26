@@ -1,10 +1,6 @@
-use std::{collections::HashSet, default};
-
-use crate::minions::{Minion, MinionConfig};
-
-use super::ActiveHero;
+use crate::minions::Minion;
 use bevy::prelude::*;
-use rand;
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, Copy, Component, PartialEq, Hash)]
 pub struct UpgradeChoice {

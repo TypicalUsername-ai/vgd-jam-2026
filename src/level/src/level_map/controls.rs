@@ -39,7 +39,7 @@ pub(crate) fn setup_controls(mut commands: Commands) {
 }
 
 pub fn start_level(
-    event: On<Pointer<Click>>,
+    _event: On<Pointer<Click>>,
     level_state: Res<State<LevelState>>,
     mut next_level_state: ResMut<NextState<LevelState>>,
 ) {
@@ -113,7 +113,7 @@ pub(crate) fn draw_win_screen(mut commands: Commands) {
 }
 
 fn load_next_level(
-    event: On<Pointer<Click>>,
+    _event: On<Pointer<Click>>,
     level_config: Res<LevelMapConfig>,
     mut save_game: ResMut<SaveGameState>,
     mut next_level_state: ResMut<NextState<LevelState>>,
@@ -166,6 +166,6 @@ pub(crate) fn draw_loss_screen(mut commands: Commands) {
     });
 }
 
-fn reload_level(event: On<Pointer<Click>>, mut next_level_state: ResMut<NextState<LevelState>>) {
+fn reload_level(_event: On<Pointer<Click>>, mut next_level_state: ResMut<NextState<LevelState>>) {
     next_level_state.set(LevelState::Pre);
 }

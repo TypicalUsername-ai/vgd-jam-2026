@@ -1,9 +1,6 @@
 use super::map_config::LevelMapConfig;
 use crate::{
-    heroes::{
-        ActiveHero, AvailableUpgrades, HeroConfig, HeroConfigs, Upgrade, UpgradeChoice,
-        UpgradeKind, UpgradePoints,
-    },
+    heroes::{ActiveHero, AvailableUpgrades, UpgradeChoice, UpgradeKind, UpgradePoints},
     ui_assets::UiAssets,
 };
 use bevy::{ecs::relationship::RelatedSpawnerCommands, prelude::*};
@@ -65,7 +62,7 @@ fn build_portrait(
     background: &Handle<Image>,
     tracker_id: Entity,
 ) {
-    let hero_id = spawner
+    let _hero_id = spawner
         .spawn((
             Node {
                 width: percent(100.),

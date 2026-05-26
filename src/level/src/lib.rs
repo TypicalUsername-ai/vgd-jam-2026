@@ -8,8 +8,7 @@ mod heroes;
 mod level_map;
 mod minions;
 mod turrets;
-use animation::{Action, AnimationState};
-use level_map::LevelMapConfig;
+use animation::Action;
 
 pub struct LevelPlugin {
     hero_configs: Vec<PathBuf>,
