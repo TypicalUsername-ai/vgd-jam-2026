@@ -6,6 +6,7 @@ use bevy::prelude::*;
 pub enum LevelState {
     #[default]
     Pre,
+    Setup,
     Active,
     Lost,
     Won,

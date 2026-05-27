@@ -27,6 +27,10 @@ pub(crate) struct LevelMapConfig {
     pub bg_color: Color,
     /// background sprite for level backdrop
     pub bg_image: Option<PathBuf>,
+    /// conversations and tips to be displayed before a level
+    pub messages: Vec<String>,
+    /// available slots for heroes
+    pub hero_slots: u8,
 }
 
 /// Load configs from .ron files

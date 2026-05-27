@@ -10,6 +10,8 @@ mod minions;
 mod turrets;
 use animation::Action;
 
+use crate::level_map::LevelMapConfig;
+
 pub struct LevelPlugin {
     hero_configs: Vec<PathBuf>,
     turret_configs: Vec<PathBuf>,
@@ -37,12 +39,19 @@ impl Plugin for LevelPlugin {
                 level_map::load_level,
                 level_map::setup_background,
                 level_map::setup_path,
+                level_map::display_messages,
+            )
+                .run_if(in_state(GlobalState::ActiveLevel))
+                .chain(),
+        );
+        app.add_systems(
+            OnEnter(LevelState::Setup),
+            (
                 level_map::setup_turrets,
                 level_map::setup_hero_slots,
                 level_map::roll_upgrades,
                 level_map::setup_controls,
             )
-                .run_if(in_state(GlobalState::ActiveLevel))
                 .chain(),
         );
         app.add_systems(

@@ -48,7 +48,8 @@ pub fn start_level(
     mut next_level_state: ResMut<NextState<LevelState>>,
 ) {
     match **level_state {
-        LevelState::Pre => next_level_state.set(LevelState::Active),
+        LevelState::Pre => next_level_state.set(LevelState::Setup),
+        LevelState::Setup => next_level_state.set(LevelState::Active),
         LevelState::Active => next_level_state.set(LevelState::Pre),
         LevelState::Lost => todo!(),
         LevelState::Won => todo!(),
@@ -171,7 +172,7 @@ pub(crate) fn draw_loss_screen(mut commands: Commands) {
 }
 
 fn reload_level(_event: On<Pointer<Click>>, mut next_level_state: ResMut<NextState<LevelState>>) {
-    next_level_state.set(LevelState::Pre);
+    next_level_state.set(LevelState::Setup);
 }
 
 pub(crate) fn ingame_pause(mut commands: Commands) {

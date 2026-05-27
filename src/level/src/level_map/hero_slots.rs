@@ -22,7 +22,11 @@ impl HeroSlot {
     }
 }
 
-pub(crate) fn setup_hero_slots(mut commands: Commands, ui_assets: Res<UiAssets>) {
+pub(crate) fn setup_hero_slots(
+    mut commands: Commands,
+    ui_assets: Res<UiAssets>,
+    level_config: Res<LevelMapConfig>,
+) {
     commands
         .spawn((
             Node {
@@ -39,7 +43,7 @@ pub(crate) fn setup_hero_slots(mut commands: Commands, ui_assets: Res<UiAssets>)
             //ImageNode::new(texture),
         ))
         .with_children(|cs| {
-            for _i in 0..4 {
+            for _i in 0..level_config.hero_slots {
                 let bar_id = cs
                     .spawn((
                         ImageNode::from_atlas_image(
