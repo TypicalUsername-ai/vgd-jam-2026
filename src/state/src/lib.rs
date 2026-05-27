@@ -1,4 +1,3 @@
-mod config_location;
 mod global_state;
 mod level_state;
 mod pause_state;
@@ -6,8 +5,6 @@ use bevy::prelude::*;
 pub use global_state::GlobalState;
 pub use level_state::LevelState;
 pub use pause_state::PauseState;
-
-pub use config_location::ConfigFileLocation;
 
 pub struct GameStatePlugin {}
 

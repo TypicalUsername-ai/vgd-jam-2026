@@ -1,12 +1,6 @@
 use crate::{LevelConfiguration, level_config::SaveGameState};
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
-use state::ConfigFileLocation;
-use std::{
-    fs::File,
-    io::Read,
-    path::{Path, PathBuf},
-};
 
 #[derive(Deserialize, Serialize, Asset, Clone, TypePath, Resource, Deref)]
 pub struct SaveSelectConfig {

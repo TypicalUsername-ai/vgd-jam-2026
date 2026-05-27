@@ -19,17 +19,22 @@ pub(crate) struct TurretConfig {
 #[derive(Debug, Resource, Deref)]
 pub(crate) struct TurretConfigs(HashMap<TurretKind, TurretConfig>);
 
-impl TurretConfigs {
-    pub(crate) fn init(config_paths: &[PathBuf], asset_server: &AssetServer) -> Self {
-        let hmap = config_paths
-            .iter()
-            .map(|p| {
-                let sck = TurretConfigKeys::from(p);
-                (sck.kind, TurretConfig::build(sck, asset_server))
-            })
-            .collect();
-        TurretConfigs(hmap)
-    }
+pub(crate) fn setup_turrets(
+    mut commands: Commands,
+    config_handles: Res<TurretConfigHandles>,
+    mut configs: ResMut<Assets<TurretConfigKeys>>,
+    asset_server: Res<AssetServer>,
+) {
+    let hmap = config_handles
+        .iter()
+        .map(|h| {
+            let sck = configs
+                .remove(h)
+                .expect("all turret configs should be loaded");
+            (sck.kind, TurretConfig::build(sck, &asset_server))
+        })
+        .collect();
+    commands.insert_resource(TurretConfigs(hmap));
 }
 
 impl TurretConfig {
@@ -65,9 +70,9 @@ pub enum TurretKind {
     Basic,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Asset, TypePath)]
 #[serde(rename = "TurretConfig")]
-struct TurretConfigKeys {
+pub struct TurretConfigKeys {
     kind: TurretKind,
     shot_time: f32,
     damage: f32,
@@ -78,18 +83,16 @@ struct TurretConfigKeys {
     //projectile_config_path: PathBuf,
 }
 
-impl From<&PathBuf> for TurretConfigKeys {
-    fn from(value: &PathBuf) -> Self {
-        let config = File::open(value);
-        match config {
-            Ok(mut config_file) => {
-                let mut buf = String::new();
-                let _ = config_file.read_to_string(&mut buf);
-                ron::from_str(&buf).expect("error parsing options file!! {value}")
-            }
-            Err(_err) => {
-                panic!("error reading file!! {}", value.display())
-            }
-        }
+#[derive(Debug, Resource, Deref)]
+pub struct TurretConfigHandles(pub Vec<Handle<TurretConfigKeys>>);
+
+impl TurretConfigHandles {
+    pub fn load_turrets(configs: &[&str], asset_server: &AssetServer) -> Self {
+        let handles = configs
+            .iter()
+            .map(|c| format!("turrets/{}.turret.ron", c))
+            .map(|p| asset_server.load::<TurretConfigKeys>(p))
+            .collect::<Vec<_>>();
+        Self(handles)
     }
 }

@@ -13,44 +13,53 @@ use animation::Action;
 
 use crate::{
     heroes::{HeroConfigHandles, HeroConfigKeys},
-    level_map::LevelMapConfig,
+    level_map::{LevelConfigHandles, LevelMapConfig},
+    minions::{MinionConfigHandles, MinionConfigKeys},
+    turrets::{TurretConfigHandles, TurretConfigKeys},
 };
 
-pub struct LevelPlugin {
-    hero_configs: Vec<PathBuf>,
-    turret_configs: Vec<PathBuf>,
-    minion_configs: Vec<PathBuf>,
-}
+pub struct LevelPlugin {}
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
             //RonAssetPlugin::<LevelConfiguration>::new(&["level.ron"]),
             RonAssetPlugin::<HeroConfigKeys>::new(&["hero.ron"]),
+            RonAssetPlugin::<MinionConfigKeys>::new(&["minion.ron"]),
+            RonAssetPlugin::<TurretConfigKeys>::new(&["turret.ron"]),
+            RonAssetPlugin::<LevelMapConfig>::new(&["level.ron"]),
         ));
         app.insert_resource(ui_assets::UiAssets::init(app.get_asset_server()));
+        let animals = ["chicken", "cow", "llama", "pig", "sheep"];
+        let turrets = ["basic"];
+        let levels = ["tutorial", "demo_1"];
         app.insert_resource(HeroConfigHandles::load_heroes(
-            &["chicken", "cow", "llama", "pig", "sheep"],
+            &animals,
             app.get_asset_server(),
         ));
-        app.insert_resource(turrets::TurretConfigs::init(
-            &self.turret_configs,
+        app.insert_resource(MinionConfigHandles::load_minions(
+            &animals,
             app.get_asset_server(),
         ));
-        app.insert_resource(minions::MinionConfigs::init(
-            &self.minion_configs,
+        app.insert_resource(TurretConfigHandles::load_turrets(
+            &turrets,
+            app.get_asset_server(),
+        ));
+        app.insert_resource(LevelConfigHandles::load_levels(
+            &levels,
             app.get_asset_server(),
         ));
         app.add_systems(
             OnEnter(LevelState::Pre),
             (
+                level_map::setup_levels.run_if(not(resource_exists::<level_map::LevelConfigs>)),
                 level_map::load_level,
                 level_map::setup_background,
                 level_map::setup_path,
                 level_map::display_messages,
                 heroes::setup_heroes.run_if(not(resource_exists::<heroes::HeroConfigs>)),
-                //turrets::setup_turrets.run_if(not(resource_exists::<turrets::TurretConfigs>)),
-                //minions::setup_minions.run_if(not(resource_exists::<minions::MinionConfigs>)),
+                turrets::setup_turrets.run_if(not(resource_exists::<turrets::TurretConfigs>)),
+                minions::setup_minions.run_if(not(resource_exists::<minions::MinionConfigs>)),
             )
                 .run_if(in_state(GlobalState::ActiveLevel))
                 .chain(),
@@ -86,37 +95,4 @@ impl Plugin for LevelPlugin {
         app.add_systems(OnEnter(LevelState::Won), (level_map::draw_win_screen));
         app.add_systems(OnEnter(LevelState::Lost), (level_map::draw_loss_screen));
     }
-}
-
-impl LevelPlugin {
-    #[must_use]
-    pub fn new(
-        configs_path: PathBuf,
-        //hero_configs_path: PathBuf,
-        //turret_configs_path: PathBuf,
-        //minion_configs_path: PathBuf,
-    ) -> Self {
-        Self {
-            hero_configs: read_configs_dir(configs_path.join("heroes")),
-            turret_configs: read_configs_dir(configs_path.join("turrets")),
-            minion_configs: read_configs_dir(configs_path.join("minions")),
-        }
-    }
-}
-
-fn read_configs_dir(dir: PathBuf) -> Vec<PathBuf> {
-    dir.read_dir()
-        .expect("configs path is a directory")
-        .filter_map(|e| {
-            // dont need to check for exists as we enumerate a directory
-            if let Ok(f) = e
-                && f.path().extension().is_some_and(|e| e == "ron")
-            {
-                Some(f.path())
-            } else {
-                // Dir entry is invalid
-                None
-            }
-        })
-        .collect()
 }

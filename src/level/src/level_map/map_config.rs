@@ -1,18 +1,17 @@
+use std::collections::HashMap;
+
 use crate::heroes::HeroKind;
 
 use super::TurretPoint;
 use bevy::prelude::*;
 use serde::Deserialize;
-use std::{
-    fs::File,
-    io::Read,
-    path::{Path, PathBuf},
-};
 
 /// used to configure the initial map state and resource locations for a given level
 /// handles necessary components for each level:
-#[derive(Debug, Deserialize, Resource)]
+#[derive(Debug, Deserialize, Resource, Asset, TypePath, Clone)]
 pub(crate) struct LevelMapConfig {
+    /// string id of the level
+    pub id: String,
     /// set of points which connected make the path minions have to walk
     pub path_points: Vec<Vec3>,
     /// hold locations of all [TowerPoint]s
@@ -33,23 +32,37 @@ pub(crate) struct LevelMapConfig {
     pub hero_slots: u8,
 }
 
-/// Load configs from .ron files
-impl From<&Path> for LevelMapConfig {
-    fn from(value: &Path) -> Self {
-        let config = File::open(value);
-        match config {
-            Ok(mut config_file) => {
-                let mut buf = String::new();
-                config_file
-                    .read_to_string(&mut buf)
-                    .expect("Unexpected IO error");
-                ron::from_str(&buf).unwrap_or_else(|e| {
-                    panic!("error parsing options file {}! {}", value.display(), e)
-                })
-            }
-            Err(_err) => {
-                panic!("error reading file!! {}", value.display())
-            }
-        }
+#[derive(Debug, Resource, Deref)]
+pub(crate) struct LevelConfigHandles(pub Vec<Handle<LevelMapConfig>>);
+
+impl LevelConfigHandles {
+    pub(crate) fn load_levels(configs: &[&str], asset_server: &AssetServer) -> Self {
+        let handles = configs
+            .iter()
+            .map(|c| format!("maps/{}.level.ron", c))
+            .map(|p| asset_server.load::<LevelMapConfig>(p))
+            .collect::<Vec<_>>();
+        Self(handles)
     }
+}
+
+#[derive(Debug, Resource, Deref)]
+pub(crate) struct LevelConfigs(HashMap<String, LevelMapConfig>);
+
+pub(crate) fn setup_levels(
+    mut commands: Commands,
+    config_handles: Res<LevelConfigHandles>,
+    mut configs: ResMut<Assets<LevelMapConfig>>,
+    asset_server: Res<AssetServer>,
+) {
+    let hmap = config_handles
+        .iter()
+        .map(|h| {
+            let sck = configs
+                .remove(h)
+                .expect("all level configs should be loaded");
+            (sck.id.clone(), sck)
+        })
+        .collect();
+    commands.insert_resource(LevelConfigs(hmap));
 }

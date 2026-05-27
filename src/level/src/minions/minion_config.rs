@@ -79,47 +79,48 @@ impl MinionConfig {
     }
 }
 
+pub(crate) fn setup_minions(
+    mut commands: Commands,
+    config_handles: Res<MinionConfigHandles>,
+    mut configs: ResMut<Assets<MinionConfigKeys>>,
+    asset_server: Res<AssetServer>,
+) {
+    let hmap = config_handles
+        .iter()
+        .map(|h| {
+            let sck = configs
+                .remove(h)
+                .expect("all minion configs should be loaded");
+            (sck.kind, MinionConfig::build(sck, &asset_server))
+        })
+        .collect();
+    commands.insert_resource(MinionConfigs(hmap));
+}
+
 #[derive(Debug, Resource, Deref)]
 pub(crate) struct MinionConfigs(HashMap<MinionKind, MinionConfig>);
 
-impl MinionConfigs {
-    pub(crate) fn init(config_paths: &[PathBuf], asset_server: &AssetServer) -> Self {
-        let hmap = config_paths
+#[derive(Debug, Resource, Deref)]
+pub(crate) struct MinionConfigHandles(pub Vec<Handle<MinionConfigKeys>>);
+
+impl MinionConfigHandles {
+    pub(crate) fn load_minions(configs: &[&str], asset_server: &AssetServer) -> Self {
+        let handles = configs
             .iter()
-            .map(|p| {
-                let mck = MinionConfigKeys::from(p);
-                (mck.kind, MinionConfig::build(mck, asset_server))
-            })
-            .collect();
-        MinionConfigs(hmap)
+            .map(|c| format!("minions/{}.minion.ron", c))
+            .map(|p| asset_server.load::<MinionConfigKeys>(p))
+            .collect::<Vec<_>>();
+        Self(handles)
     }
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, Asset, TypePath)]
 #[serde(rename = "MinionConfig")]
-struct MinionConfigKeys {
+pub(crate) struct MinionConfigKeys {
     kind: MinionKind,
     health: f32,
     speed: f32,
     animations: Vec<(Action, usize)>,
     sprite_path: PathBuf,
     tile_size: UVec2,
-}
-
-impl From<&PathBuf> for MinionConfigKeys {
-    fn from(value: &PathBuf) -> Self {
-        let config = File::open(value);
-        match config {
-            Ok(mut config_file) => {
-                let mut buf = String::new();
-                let _ = config_file.read_to_string(&mut buf);
-                ron::from_str(&buf).unwrap_or_else(|e| {
-                    panic!("error parsing options file {}! {}", value.display(), e)
-                })
-            }
-            Err(_err) => {
-                panic!("error reading file!! {}", value.display())
-            }
-        }
-    }
 }

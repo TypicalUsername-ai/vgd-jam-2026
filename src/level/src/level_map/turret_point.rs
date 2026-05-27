@@ -10,7 +10,7 @@ use crate::{
 };
 
 /// a single point which can holds a specified turret
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Copy)]
 pub(crate) struct TurretPoint {
     /// the center position of the point
     pub position: Vec3,

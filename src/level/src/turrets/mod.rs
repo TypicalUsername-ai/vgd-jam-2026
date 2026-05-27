@@ -1,6 +1,8 @@
 mod turret_config;
 
-pub(crate) use turret_config::{TurretConfig, TurretConfigs, TurretKind};
+pub(crate) use turret_config::{
+    TurretConfig, TurretConfigHandles, TurretConfigKeys, TurretConfigs, TurretKind, setup_turrets,
+};
 //pub(crate) use turrets::{Turret, fire_turrets};
 
 use bevy::prelude::*;
