@@ -80,14 +80,15 @@ impl Plugin for LevelPlugin {
 impl LevelPlugin {
     #[must_use]
     pub fn new(
-        hero_configs_path: PathBuf,
-        turret_configs_path: PathBuf,
-        minion_configs_path: PathBuf,
+        configs_path: PathBuf,
+        //hero_configs_path: PathBuf,
+        //turret_configs_path: PathBuf,
+        //minion_configs_path: PathBuf,
     ) -> Self {
         Self {
-            hero_configs: read_configs_dir(hero_configs_path),
-            turret_configs: read_configs_dir(turret_configs_path),
-            minion_configs: read_configs_dir(minion_configs_path),
+            hero_configs: read_configs_dir(configs_path.join("heroes")),
+            turret_configs: read_configs_dir(configs_path.join("turrets")),
+            minion_configs: read_configs_dir(configs_path.join("minions")),
         }
     }
 }
