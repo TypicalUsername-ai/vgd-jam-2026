@@ -14,14 +14,14 @@ impl std::cmp::Eq for UpgradeChoice {}
 impl UpgradeChoice {
     pub fn roll(kind: UpgradeKind, level: u8) -> Self {
         let modifier_range = match level {
-            1 => 5..=15,
-            2 => 15..=25,
-            3 => 25..=35,
+            1 => 7,
+            2 => 15,
+            3 => 25,
             _ => unimplemented!(),
         };
         Self {
             kind,
-            bonus: rand::random_range(modifier_range),
+            bonus: modifier_range,
             level,
         }
     }

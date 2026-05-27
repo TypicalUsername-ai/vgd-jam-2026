@@ -3,7 +3,9 @@ mod hero_config;
 mod upgrades;
 
 pub(crate) use active_hero::{ActiveHero, HeroKind};
-pub(crate) use hero_config::{HeroConfig, HeroConfigs};
+pub(crate) use hero_config::{
+    HeroConfig, HeroConfigHandles, HeroConfigKeys, HeroConfigs, setup_heroes,
+};
 pub(crate) use upgrades::{
     AvailableUpgrades, HeroUpgrade as Upgrade, UpgradeChoice, UpgradeKind, UpgradePoints,
 };

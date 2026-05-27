@@ -11,7 +11,11 @@ mod window;
 
 fn main() {
     //let config = std::path::Path::new("../assets/saves-config.ron");
-    let config_location: PathBuf = Path::new("../assets").into();
+    let config_location: PathBuf = if cfg!(debug_assertions) {
+        Path::new("../assets").into()
+    } else {
+        Path::new("assets").into()
+    };
 
     let mut app = App::new();
 
@@ -20,16 +24,15 @@ fn main() {
         DefaultPlugins
             .set(window::default_fulscreen_plugin())
             .set(AssetPlugin {
+                #[cfg(debug_assertions)]
                 file_path: "../../assets".into(),
                 ..default()
             }),
     )
     .add_plugins(GameStatePlugin {})
     .add_plugins(MainMenuPlugin {})
-    .add_plugins(LevelSelectPlugin::from(
-        config_location.join("saves-config.ron").as_path(),
-    ))
-    .add_plugins(LevelPlugin::new(config_location.clone()));
+    .add_plugins(LevelSelectPlugin {})
+    .add_plugins(LevelPlugin::new(config_location));
 
     #[cfg(feature = "inspector")]
     app.add_plugins(EguiPlugin::default())

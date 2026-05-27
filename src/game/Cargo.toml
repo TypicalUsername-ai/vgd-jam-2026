@@ -1,13 +1,13 @@
 [package]
-name = "insert-pet-hero-tower-offense-game-here"
-version = "0.1.0"
+name = "animal-rush"
+version = "0.2.0"
 edition = "2024"
 
 [target.x86_64-unknown-linux-gnu]
 linker = "clang"
 
 [dependencies]
-bevy = { version = "0.18", features = ["mouse"] }
+bevy = { version = "0.18", features = ["mouse", "web", "touch"] }
 state = { path = "../state" }
 level = { path = "../level" }
 main_menu = { path = "../main_menu" }

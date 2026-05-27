@@ -20,18 +20,25 @@ pub(crate) struct HeroConfig {
 #[derive(Debug, Resource, Deref)]
 pub(crate) struct HeroConfigs(HashMap<HeroKind, HeroConfig>);
 
-impl HeroConfigs {
-    pub(crate) fn init(config_paths: &[PathBuf], asset_server: &AssetServer) -> Self {
-        let hmap = config_paths
-            .iter()
-            .map(|p| {
-                let sck = HeroConfigKeys::from(p);
-                (sck.kind, HeroConfig::build(sck, asset_server))
-            })
-            .collect();
-        HeroConfigs(hmap)
-    }
+//impl HeroConfigs {
+pub(crate) fn setup_heroes(
+    mut commands: Commands,
+    config_handles: Res<HeroConfigHandles>,
+    mut configs: ResMut<Assets<HeroConfigKeys>>,
+    asset_server: Res<AssetServer>,
+) {
+    let hmap = config_handles
+        .iter()
+        .map(|h| {
+            let sck = configs
+                .remove(h)
+                .expect("all hero configs should be loaded");
+            (sck.kind, HeroConfig::build(sck, &asset_server))
+        })
+        .collect();
+    commands.insert_resource(HeroConfigs(hmap));
 }
+//}
 
 impl HeroConfig {
     fn build(value: HeroConfigKeys, asset_server: &AssetServer) -> Self {
@@ -58,28 +65,25 @@ impl HeroConfig {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Asset, TypePath)]
 #[serde(rename = "HeroConfig")]
-struct HeroConfigKeys {
+pub(crate) struct HeroConfigKeys {
     kind: HeroKind,
     animations: Vec<(Action, usize)>,
     sprite_path: PathBuf,
     tile_size: UVec2,
     spawned_minion: MinionKind,
 }
+#[derive(Debug, Resource, Deref)]
+pub(crate) struct HeroConfigHandles(pub Vec<Handle<HeroConfigKeys>>);
 
-impl From<&PathBuf> for HeroConfigKeys {
-    fn from(value: &PathBuf) -> Self {
-        let config = File::open(value);
-        match config {
-            Ok(mut config_file) => {
-                let mut buf = String::new();
-                let _ = config_file.read_to_string(&mut buf);
-                ron::from_str(&buf).expect("error parsing options file!! {value}")
-            }
-            Err(_err) => {
-                panic!("error reading file!! {}", value.display())
-            }
-        }
+impl HeroConfigHandles {
+    pub fn load_heroes(configs: &[&str], asset_server: &AssetServer) -> Self {
+        let handles = configs
+            .iter()
+            .map(|c| format!("heroes/{}.hero.ron", c))
+            .map(|p| asset_server.load::<HeroConfigKeys>(p))
+            .collect::<Vec<_>>();
+        Self(handles)
     }
 }

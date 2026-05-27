@@ -8,11 +8,15 @@ use std::{
     path::{Path, PathBuf},
 };
 
-#[derive(Deserialize, Serialize, Resource, Clone)]
+#[derive(Deserialize, Serialize, Asset, Clone, TypePath, Resource, Deref)]
 pub struct SaveSelectConfig {
     pub(crate) saves: Vec<SaveGameState>, // TODO move to mage saves
 }
 
+#[derive(Debug, Resource)]
+pub(crate) struct SaveSelectConfigHandle(pub Handle<SaveSelectConfig>);
+
+/*
 impl From<&Path> for SaveSelectConfig {
     fn from(value: &Path) -> Self {
         let config = File::open(value);
@@ -30,16 +34,15 @@ impl From<&Path> for SaveSelectConfig {
         }
     }
 }
+*/
 
-pub fn sync_to_save_file(
-    config_location: Res<ConfigFileLocation>,
-    save_config: Res<SaveSelectConfig>,
-) {
-    let data =
-        ron::to_string(save_config.into_inner()).expect("save config should be serializeable");
+/*
+pub fn sync_to_save_file(config_location: Res<ConfigFileLocation>, save_config: Res<LoadedSaves>) {
+    let data = ron::to_string(save_config).expect("save config should be serializeable");
     std::fs::write(
         config_location.join("saves-config").with_extension("ron"),
         data,
     )
     .expect("writing to file should work");
 }
+*/

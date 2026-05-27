@@ -1,4 +1,5 @@
 use bevy::{asset::io::embedded::GetAssetServer, prelude::*};
+use bevy_common_assets::ron::RonAssetPlugin;
 use state::{GlobalState, LevelState, PauseState};
 use std::path::PathBuf;
 mod ui_assets;
@@ -10,7 +11,10 @@ mod minions;
 mod turrets;
 use animation::Action;
 
-use crate::level_map::LevelMapConfig;
+use crate::{
+    heroes::{HeroConfigHandles, HeroConfigKeys},
+    level_map::LevelMapConfig,
+};
 
 pub struct LevelPlugin {
     hero_configs: Vec<PathBuf>,
@@ -20,9 +24,13 @@ pub struct LevelPlugin {
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
+        app.add_plugins((
+            //RonAssetPlugin::<LevelConfiguration>::new(&["level.ron"]),
+            RonAssetPlugin::<HeroConfigKeys>::new(&["hero.ron"]),
+        ));
         app.insert_resource(ui_assets::UiAssets::init(app.get_asset_server()));
-        app.insert_resource(heroes::HeroConfigs::init(
-            &self.hero_configs,
+        app.insert_resource(HeroConfigHandles::load_heroes(
+            &["chicken", "cow", "llama", "pig", "sheep"],
             app.get_asset_server(),
         ));
         app.insert_resource(turrets::TurretConfigs::init(
@@ -40,6 +48,9 @@ impl Plugin for LevelPlugin {
                 level_map::setup_background,
                 level_map::setup_path,
                 level_map::display_messages,
+                heroes::setup_heroes.run_if(not(resource_exists::<heroes::HeroConfigs>)),
+                //turrets::setup_turrets.run_if(not(resource_exists::<turrets::TurretConfigs>)),
+                //minions::setup_minions.run_if(not(resource_exists::<minions::MinionConfigs>)),
             )
                 .run_if(in_state(GlobalState::ActiveLevel))
                 .chain(),
