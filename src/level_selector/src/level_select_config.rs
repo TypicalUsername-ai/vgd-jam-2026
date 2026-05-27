@@ -1,15 +1,15 @@
 use crate::{LevelConfiguration, level_config::SaveGameState};
 use bevy::prelude::*;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use state::ConfigFileLocation;
 use std::{
     fs::File,
     io::Read,
     path::{Path, PathBuf},
 };
 
-#[derive(Deserialize, Resource, Clone)]
+#[derive(Deserialize, Serialize, Resource, Clone)]
 pub struct SaveSelectConfig {
-    pub(crate) map_config_folder: PathBuf,
     pub(crate) saves: Vec<SaveGameState>, // TODO move to mage saves
 }
 
@@ -29,4 +29,17 @@ impl From<&Path> for SaveSelectConfig {
             }
         }
     }
+}
+
+pub fn sync_to_save_file(
+    config_location: Res<ConfigFileLocation>,
+    save_config: Res<SaveSelectConfig>,
+) {
+    let data =
+        ron::to_string(save_config.into_inner()).expect("save config should be serializeable");
+    std::fs::write(
+        config_location.join("saves-config").with_extension("ron"),
+        data,
+    )
+    .expect("writing to file should work");
 }
