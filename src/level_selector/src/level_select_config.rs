@@ -24,8 +24,8 @@ impl From<&Path> for SaveSelectConfig {
                     panic!("error parsing options file {:?} with error {}", value, e)
                 })
             }
-            Err(_err) => {
-                panic!("error reading file!! {}", value.display())
+            Err(err) => {
+                panic!("error reading file!! {}\n{}", value.display(), err)
             }
         }
     }
