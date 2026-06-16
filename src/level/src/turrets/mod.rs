@@ -1,5 +1,6 @@
 mod turret_config;
 
+#[allow(unused)]
 pub(crate) use turret_config::{
     TurretConfig, TurretConfigHandles, TurretConfigKeys, TurretConfigs, TurretKind, setup_turrets,
 };

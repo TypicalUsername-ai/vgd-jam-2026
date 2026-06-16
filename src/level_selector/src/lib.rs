@@ -1,6 +1,5 @@
 use bevy::{asset::io::embedded::GetAssetServer, prelude::*};
 use state::GlobalState;
-use std::path::Path;
 mod level_config;
 mod level_select_config;
 mod ui;

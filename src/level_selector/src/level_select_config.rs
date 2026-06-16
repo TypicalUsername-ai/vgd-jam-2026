@@ -1,4 +1,4 @@
-use crate::{LevelConfiguration, level_config::SaveGameState};
+use crate::level_config::SaveGameState;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 

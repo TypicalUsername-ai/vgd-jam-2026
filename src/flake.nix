@@ -11,7 +11,8 @@
       url  = "github:numtide/flake-utils";
     };
     naersk = {
-          url = "github:nix-community/naersk";
+          #url = "github:nix-community/naersk";
+          url = "github:nix-community/naersk/pull/391/head";
           inputs.nixpkgs.follows = "nixpkgs";
         };
   };
@@ -43,6 +44,9 @@
         ];
 
         naersk' = pkgs.callPackage naersk {};
+        rust-toolchain = pkgs.rust-bin.stable.latest.default.override {
+                      targets = [ "wasm32-unknown-unknown" ];
+                    };
       in
       with pkgs;
       {
@@ -50,9 +54,10 @@
           buildInputs = [
             pkg-config
             just
-            rust-bin.stable.latest.default
+            rust-toolchain
             mold
             clang
+            wasm-bindgen-cli_0_2_114
           ] ++ lib.optionals (lib.strings.hasInfix "linux" system) linux-deps;
 
           RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
@@ -70,20 +75,22 @@
         packages.default  = naersk'.buildPackage {
                   nativeBuildInputs = [
                     pkg-config
-                  ] ++ lib.optionals (lib.strings.hasInfix "linux" system) linux-deps;
-                  buildInputs = [
-                    mold # faster linker instead of gcc - requires linking via clang
-                    clang # for linker override in binary Cargo.toml
+                    rust-toolchain
+                    lld
                   ];
+                  #++ lib.optionals (lib.strings.hasInfix "linux" system) linux-deps;
                   src = ./.;
-                  CARGO_BUILD_TARGET = "x86_64-unknown-linux-gnu";
-                  CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "clang";
+                  CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
                   CARGO_BUILD_RUSTFLAGS = [
-                    "-C link-arg=-fuse-ld=${pkgs.mold}/bin/mold"
+                    "--cfg getrandom_backend=\"wasm_js\""
                   ];
-                  LD_LIBRARY_PATH = lib.makeLibraryPath linux-deps;
-                  pname = "insert-pet-hero-tower-offense-game-here";
-                  release = false;
+                  #CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "clang";
+                  #CARGO_BUILD_RUSTFLAGS = [
+                  #  "-C link-arg=-fuse-ld=${pkgs.mold}/bin/mold"
+                  #];
+                  #LD_LIBRARY_PATH = lib.makeLibraryPath linux-deps;
+                  pname = "animal-rush";
+                  release = true;
                 };
 
       }

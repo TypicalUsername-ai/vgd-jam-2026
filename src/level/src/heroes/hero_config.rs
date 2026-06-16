@@ -5,8 +5,6 @@ use crate::minions::MinionKind;
 use bevy::prelude::*;
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::Read;
 use std::path::PathBuf;
 
 #[derive(Debug)]

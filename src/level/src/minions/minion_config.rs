@@ -6,8 +6,6 @@ use crate::minions::Minion;
 use bevy::prelude::*;
 use state::LevelState;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::Read;
 use std::path::PathBuf;
 
 #[derive(Debug)]

@@ -5,7 +5,6 @@ use level::LevelPlugin;
 use level_selector::LevelSelectPlugin;
 use main_menu::MainMenuPlugin;
 use state::GameStatePlugin;
-use std::path::{Path, PathBuf};
 
 mod window;
 

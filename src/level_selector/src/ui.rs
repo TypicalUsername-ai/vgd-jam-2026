@@ -1,13 +1,9 @@
-use std::ops::Deref;
-
 use bevy::prelude::*;
 use chrono::Utc;
 use state::{GlobalState, LevelState};
 use tracing::warn;
 
-use crate::{
-    SaveSelectConfig, level_config::SaveGameState, level_select_config::SaveSelectConfigHandle,
-};
+use crate::{SaveSelectConfig, level_config::SaveGameState};
 
 #[derive(Debug, Component)]
 pub(crate) struct LevelSelectMenu {}

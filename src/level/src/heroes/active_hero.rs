@@ -1,8 +1,5 @@
-use crate::animation::AnimationState;
+use crate::minions::MinionKind;
 use bevy::prelude::*;
-
-use super::hero_config::HeroConfig;
-use crate::{animation::Action, minions::MinionKind};
 
 #[derive(Debug, Component, Clone)]
 pub(crate) struct ActiveHero {
