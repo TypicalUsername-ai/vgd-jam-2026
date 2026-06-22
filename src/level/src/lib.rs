@@ -31,7 +31,7 @@ impl Plugin for LevelPlugin {
         app.insert_resource(ui_assets::UiAssets::init(app.get_asset_server()));
         let animals = ["chicken", "cow", "llama", "pig", "sheep"];
         let turrets = ["basic"];
-        let levels = ["tutorial", "demo_1"];
+        let levels = ["tutorial", "tutorial_2", "level_1"];
         app.insert_resource(HeroConfigHandles::load_heroes(
             &animals,
             app.get_asset_server(),

@@ -57,6 +57,7 @@
             rust-toolchain
             mold
             clang
+            trunk
             wasm-bindgen-cli_0_2_114
           ] ++ lib.optionals (lib.strings.hasInfix "linux" system) linux-deps;
 
@@ -64,7 +65,7 @@
           CARGO_BUILD_TARGET = "x86_64-unknown-linux-gnu";
           CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "clang";
           CARGO_BUILD_RUSTFLAGS = [
-            "-C link-arg=-fuse-ld=${pkgs.mold}/bin/mold"
+          #  "-C link-arg=-fuse-ld=${pkgs.mold}/bin/mold"
           ];
 
           LD_LIBRARY_PATH = lib.makeLibraryPath linux-deps;

@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{asset::AssetMetaCheck, prelude::*};
 #[cfg(feature = "inspector")]
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 use level::LevelPlugin;
@@ -17,6 +17,7 @@ fn main() {
             .set(AssetPlugin {
                 #[cfg(debug_assertions)]
                 file_path: "../../assets".into(),
+                meta_check: AssetMetaCheck::Never,
                 ..default()
             }),
     )
